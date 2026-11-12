@@ -35,6 +35,7 @@ Optional front-matter fields: `date` (overrides the file name), `slug` (override
 
 | What | Where |
 | --- | --- |
+| Home page intro | `content/home.md` |
 | About page intro text | `content/about.md` |
 | Products grid, experience, strengths, education | `content/profile.json` |
 | Site name, description, social links | `content/site.json` |
