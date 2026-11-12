@@ -1,0 +1,14 @@
+// Cloudflare Workers config. Cloudflare builds and deploys this on every push to `main`.
+{
+  "name": "abdelali-site",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  // Private while in review: no public *.workers.dev address and no preview links.
+  // The site only becomes public once a custom domain (abdelali.org) is attached.
+  "workers_dev": false,
+  "preview_urls": false
+}
