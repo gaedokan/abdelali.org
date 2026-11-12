@@ -1,11 +1,11 @@
 {
   "productsTitle": "Products I've helped build",
   "products": [
-    { "name": "Emirates", "note": "Commerce app", "domain": "emirates.com" },
-    { "name": "Nespresso", "note": "iOS architecture", "domain": "nespresso.com" },
-    { "name": "CHANEL", "note": "iOS architecture", "domain": "chanel.com" },
-    { "name": "eKare", "note": "Digital wound care", "domain": "ekare.ai" },
-    { "name": "MiMs", "note": "Biometrics for Morpho", "domain": "safran-group.com" }
+    { "name": "Emirates", "note": "Commerce app", "icon": "/icons/emirates.png" },
+    { "name": "Nespresso", "note": "iOS architecture", "icon": "/icons/nespresso.png" },
+    { "name": "CHANEL", "note": "iOS architecture", "icon": "/icons/chanel.png" },
+    { "name": "eKare", "note": "Digital wound care", "icon": "/icons/ekare.png" },
+    { "name": "MiMs", "note": "Biometrics for Morpho" }
   ],
   "strengths": [
     "Swift & Objective-C",
