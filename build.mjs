@@ -2,6 +2,7 @@
 // No dependencies: run with `node build.mjs` (Node 18+).
 //
 //   content/site.json        site name, links, and the `preview` switch
+//   content/home.md          Home page intro (Markdown + front matter)
 //   content/about.md         About page intro (Markdown + front matter)
 //   content/profile.json     products, experience, strengths, education
 //   content/posts/*.md       one file per blog post — add a file, push, done
@@ -110,6 +111,7 @@ export function markdown(src) {
 const site = JSON.parse(readFileSync(join(CONTENT, "site.json"), "utf8"));
 const profile = JSON.parse(readFileSync(join(CONTENT, "profile.json"), "utf8"));
 const about = parseFrontMatter(readFileSync(join(CONTENT, "about.md"), "utf8"));
+const home = parseFrontMatter(readFileSync(join(CONTENT, "home.md"), "utf8"));
 
 const fmtDate = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const readTime = (html) => Math.max(1, Math.round(html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length / 220));
@@ -141,9 +143,9 @@ for (const p of posts) {
 const CSS = readFileSync(join(ROOT, "static", "style.css"), "utf8");
 
 function page({ title, path, content, description }) {
-  const nav = [["/", "About"], ["/blog/", "Blog"]]
+  const nav = [["/", "Writing"], ["/about/", "About"]]
     .map(([href, label]) => {
-      const current = href === "/" ? path === "/" : path.startsWith(href);
+      const current = href === "/" ? path === "/" || path.startsWith("/blog/") : path.startsWith(href);
       return `<a href="${href}"${current ? ' aria-current="page"' : ""}>${label}</a>`;
     })
     .join("");
@@ -194,8 +196,6 @@ function aboutPage() {
       <div><h3>${esc(e.role)}</h3><p class="company">${esc(e.company)}</p><p>${esc(e.text)}</p></div>
     </li>`).join("");
   const links = site.links.map((l) => `<a href="${esc(l.url)}">${esc(l.label)}</a>`).join("");
-  const latest = posts.slice(0, 3).map((p) =>
-    `<li><a href="/blog/${p.slug}/"><span class="meta"><span>${fmtDate(p.date)}</span></span><h3>${esc(p.title)}</h3></a></li>`).join("");
   const content = `
 <section class="hero">
   <h1 class="wordmark"><span class="bp" aria-hidden="true"></span><span class="word">${esc(site.name)}</span></h1>
@@ -206,16 +206,28 @@ function aboutPage() {
 <section><h2>Where I've worked</h2><ol class="timeline">${experience}</ol>
 ${profile.education ? `<p class="edu">${esc(profile.education)}</p>` : ""}</section>
 <section><h2>What I'm good at</h2><ul class="skills">${strengths}</ul></section>
-${latest ? `<section><h2>Latest writing</h2><ul class="latest">${latest}</ul><p class="more"><a href="/blog/">Read all posts</a></p></section>` : ""}
 <section class="hello"><h2>Say hello</h2><p>${esc(a.hello || "")}</p>${links ? `<p class="links">${links}</p>` : ""}</section>`;
-  return page({ title: site.title, path: "/", content });
+  return page({ title: `About | ${site.name}`, path: "/about/", content });
 }
 
-function blogPage() {
-  const items = posts.map((p) =>
-    `<li><a href="/blog/${p.slug}/"><span class="meta"><span>${fmtDate(p.date)}</span><span>${readTime(p.html)} min read</span></span><h2>${esc(p.title)}</h2><p>${esc(p.summary || "")}</p></a></li>`).join("");
-  const content = `<div class="blog-head"><h1>Blog</h1><p class="lead">${esc(site.blogIntro || "")}</p></div><ul class="posts">${items || "<li><p>No posts yet.</p></li>"}</ul>`;
-  return page({ title: `Blog | ${site.name}`, path: "/blog/", content });
+// Home: a short introduction, then every post, newest first.
+function homePage() {
+  const links = [...site.links.map((l) => `<a href="${esc(l.url)}">${esc(l.label)}</a>`), `<a href="/about/">More about me</a>`].join("");
+  const items = posts.map((p) => `
+    <li><a href="/blog/${p.slug}/">${esc(p.title)}</a>
+      <p class="meta"><time datetime="${p.date}">${fmtDate(p.date)}</time><span>${readTime(p.html)} min read</span></p>
+      ${p.summary ? `<p class="summary">${esc(p.summary)}</p>` : ""}</li>`).join("");
+  const content = `
+<section class="home-intro">
+  <h1>${esc(home.data.greeting || site.name)}</h1>
+  <div class="prose">${markdown(home.body)}</div>
+  <p class="links">${links}</p>
+</section>
+<section class="writing">
+  <h2>Writing</h2>
+  <ul class="post-list">${items || "<li>No posts yet.</li>"}</ul>
+</section>`;
+  return page({ title: site.title, path: "/", content });
 }
 
 function postPage(p) {
@@ -225,7 +237,7 @@ function postPage(p) {
   const content = `<article>
 <div class="post-head"><p class="meta"><span>${fmtDate(p.date)}</span><span>${readTime(p.html)} min read</span></p><h1>${esc(p.title)}</h1>${p.summary ? `<p class="lead">${esc(p.summary)}</p>` : ""}</div>
 <div class="prose">${p.html}</div>
-${source}<a class="back" href="/blog/">Back to all posts</a>
+${source}<a class="back" href="/">All writing</a>
 </article>`;
   return page({ title: `${p.title} | ${site.name}`, path: `/blog/${p.slug}/`, content, description: p.summary });
 }
@@ -247,14 +259,15 @@ mkdirSync(OUT, { recursive: true });
 for (const f of readdirSync(join(ROOT, "static"))) {
   if (f !== "style.css") cpSync(join(ROOT, "static", f), join(OUT, f), { recursive: true });
 }
-write("index.html", aboutPage());
-write("blog/index.html", blogPage());
+write("index.html", homePage());
+write("about/index.html", aboutPage());
+write("_redirects", "/blog /  301\n/blog/ /  301\n");
 for (const p of posts) write(`blog/${p.slug}/index.html`, postPage(p));
 write("404.html", notFoundPage());
 write("feed.xml", feed());
 write("robots.txt", site.preview ? "User-agent: *\nDisallow: /\n" : `User-agent: *\nAllow: /\n${site.url ? `Sitemap: ${site.url}/sitemap.xml\n` : ""}`);
 if (!site.preview && site.url) {
-  const urls = ["/", "/blog/", ...posts.map((p) => `/blog/${p.slug}/`)];
+  const urls = ["/", "/about/", ...posts.map((p) => `/blog/${p.slug}/`)];
   write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${site.url}${u}</loc></url>`).join("")}</urlset>`);
 }
 write("_headers", `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n${site.preview ? "  X-Robots-Tag: noindex, nofollow\n" : ""}`);
