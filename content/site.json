@@ -7,7 +7,6 @@
   "blogIntro": "Notes on iOS, Swift, AI and building software with great teams.",
   "links": [
     { "label": "LinkedIn", "url": "https://www.linkedin.com/in/abdelalii/" },
-    { "label": "Medium", "url": "https://medium.com/@gaedokan" },
     { "label": "GitHub", "url": "https://github.com/gaedokan" }
   ]
 }
