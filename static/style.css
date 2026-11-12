@@ -1,15 +1,15 @@
-/* gaedokan — design tokens */
+/* abdelali — design tokens */
 :root{
-  --paper:#F6F7F9;--surface:#FFFFFF;--ink:#14171D;--slate:#5B6170;--hair:#DDE1E8;
-  --signal:#2F5BFF;--signal-ink:#1D45E0;--signal-soft:#E7ECFF;
+  --paper:#FBF8F3;--surface:#FFFDF9;--ink:#2B2722;--slate:#71685D;--hair:#E8DFD2;
+  --signal:#B4552E;--signal-ink:#9A4424;--signal-soft:#F3DFD2;
   --display:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,sans-serif;
   --text:"Source Serif 4",Georgia,serif;
   --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --max:44rem;
 }
 @media (prefers-color-scheme:dark){:root{
-  --paper:#0F1218;--surface:#161A22;--ink:#E9ECF2;--slate:#9AA2B2;--hair:#262C38;
-  --signal:#7C95FF;--signal-ink:#A3B4FF;--signal-soft:#1B2340;
+  --paper:#1A1917;--surface:#23211E;--ink:#ECE5DA;--slate:#A69C8F;--hair:#35312C;
+  --signal:#E3906A;--signal-ink:#EBA884;--signal-soft:#3A2B23;
 }}
 
 *{box-sizing:border-box}
@@ -76,7 +76,7 @@ h3{font-size:1.2rem;margin:0}
 .apps li{display:flex;flex-direction:column;align-items:center;text-align:center}
 .apps strong{margin-top:.6rem;font:600 .92rem/1.25 var(--display)}
 .apps .note{margin-top:.15rem;font:400 .78rem/1.35 var(--display);color:var(--slate)}
-.icon{position:relative;display:grid;place-items:center;width:4rem;height:4rem;border-radius:22.5%;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px rgba(20,23,29,.08);flex:none}
+.icon{position:relative;display:grid;place-items:center;width:4rem;height:4rem;border-radius:22.5%;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px rgba(43,39,34,.08);flex:none}
 .icon .mono{width:100%;height:100%;display:grid;place-items:center;font:700 1.6rem/1 var(--display);color:#fff;background:var(--signal)}
 .icon img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
 
