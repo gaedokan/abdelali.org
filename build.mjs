@@ -113,7 +113,7 @@ const about = parseFrontMatter(readFileSync(join(CONTENT, "about.md"), "utf8"));
 
 const fmtDate = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const readTime = (html) => Math.max(1, Math.round(html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length / 220));
-const sourceName = (url) => { try { const h = new URL(url).hostname; return h.includes("linkedin") ? "LinkedIn" : h.includes("medium") ? "Medium" : h.replace(/^www\./, ""); } catch { return "the web"; } };
+const sourceName = (url) => { try { const h = new URL(url).hostname; return h.includes("linkedin") ? "LinkedIn" : h.replace(/^www\./, ""); } catch { return "the web"; } };
 
 const posts = readdirSync(join(CONTENT, "posts"))
   .filter((f) => f.endsWith(".md"))
@@ -159,18 +159,19 @@ ${site.preview ? '<meta name="robots" content="noindex,nofollow">' : ""}
 ${canonical}
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description || site.description)}">
-<meta name="theme-color" content="#FBF8F3">
+<meta name="theme-color" content="#F6F7F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1218" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="${esc(site.name)}" href="/feed.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..650;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>${CSS}</style>
 </head>
 <body>
-<header><div class="wrap"><a class="logo" href="/">${esc(site.name)}<span>.</span></a><nav>${nav}</nav></div></header>
+<header><div class="wrap"><a class="logo" href="/"><span class="bp" aria-hidden="true"></span>${esc(site.name)}</a><nav>${nav}</nav></div></header>
 <main><div class="wrap">${content}</div></main>
-<footer><div class="wrap">© ${new Date().getUTCFullYear()} ${esc(site.name)} · <a href="/feed.xml">RSS</a></div></footer>
+<footer><div class="wrap"><span>© ${new Date().getUTCFullYear()} ${esc(site.name)}</span><a href="/feed.xml">RSS feed</a></div></footer>
 </body>
 </html>`;
 }
@@ -187,38 +188,35 @@ function icon(name, domain, size = "") {
 function aboutPage() {
   const a = about.data;
   const products = profile.products.map((p) =>
-    `<li>${icon(p.name, p.domain)}<strong>${esc(p.name)}</strong><span>${esc(p.note)}</span></li>`).join("");
-  const strengths = profile.strengths.map((s) => `<li>${esc(s)}</li>`).join("");
+    `<li>${icon(p.name, p.domain)}<strong>${esc(p.name)}</strong><span class="note">${esc(p.note)}</span></li>`).join("");
+  const strengths = profile.strengths.map((s) => `<li><span class="bp" aria-hidden="true"></span>${esc(s)}</li>`).join("");
   const experience = profile.experience.map((e) => `
-    <li>${icon(e.company, e.domain, "sm")}
-      <div><p class="meta">${esc(e.dates)}</p><h3>${esc(e.role)}</h3><p class="company">${esc(e.company)}</p><p>${esc(e.text)}</p></div>
+    <li><span class="when">${esc(e.dates)}</span>
+      <div><h3>${esc(e.role)}</h3><p class="company">${esc(e.company)}</p><p>${esc(e.text)}</p></div>
     </li>`).join("");
-  const links = site.links.length
-    ? `<ul class="links">${site.links.map((l) => `<li><a href="${esc(l.url)}">${esc(l.label)} ↗</a></li>`).join("")}</ul>`
-    : "";
+  const links = site.links.map((l) => `<a href="${esc(l.url)}">${esc(l.label)}</a>`).join("");
   const latest = posts.slice(0, 3).map((p) =>
-    `<li><a href="/blog/${p.slug}/"><span class="meta">${fmtDate(p.date)}</span><h3>${esc(p.title)}</h3></a></li>`).join("");
+    `<li><a href="/blog/${p.slug}/"><span class="meta"><span>${fmtDate(p.date)}</span></span><h3>${esc(p.title)}</h3></a></li>`).join("");
   const content = `
 <section class="hero">
-  ${a.eyebrow ? `<p class="eyebrow">${esc(a.eyebrow)}</p>` : ""}
-  <h1>${esc(a.title || "About")}</h1>
+  <h1 class="wordmark"><span class="bp" aria-hidden="true"></span><span class="word">${esc(site.name)}</span></h1>
   ${a.lead ? `<p class="lead">${esc(a.lead)}</p>` : ""}
 </section>
-<section class="prose">${markdown(about.body)}</section>
-<section><h2>Products &amp; brands</h2><p class="sub">${esc(profile.productsIntro || "")}</p><ul class="apps">${products}</ul></section>
-<section><h2>What I'm good at</h2><ul class="chips">${strengths}</ul></section>
-<section><h2>Experience</h2><ul class="timeline">${experience}</ul>
+<section class="prose intro">${markdown(about.body)}</section>
+<section><h2>${esc(profile.productsTitle || "Products I've helped build")}</h2><div class="tray"><ul class="apps">${products}</ul></div></section>
+<section><h2>Where I've worked</h2><ol class="timeline">${experience}</ol>
 ${profile.education ? `<p class="edu">${esc(profile.education)}</p>` : ""}</section>
-${latest ? `<section><h2>Latest writing</h2><ul class="latest">${latest}</ul><p><a href="/blog/">All posts →</a></p></section>` : ""}
-<section class="hello"><h2>Say hello</h2><p>${esc(a.hello || "")}</p>${links}</section>`;
+<section><h2>What I'm good at</h2><ul class="skills">${strengths}</ul></section>
+${latest ? `<section><h2>Latest writing</h2><ul class="latest">${latest}</ul><p class="more"><a href="/blog/">Read all posts</a></p></section>` : ""}
+<section class="hello"><h2>Say hello</h2><p>${esc(a.hello || "")}</p>${links ? `<p class="links">${links}</p>` : ""}</section>`;
   return page({ title: site.title, path: "/", content });
 }
 
 function blogPage() {
   const items = posts.map((p) =>
-    `<li><a href="/blog/${p.slug}/"><span class="meta">${fmtDate(p.date)} · ${readTime(p.html)} min read</span><h2>${esc(p.title)}</h2><p>${esc(p.summary || "")}</p></a></li>`).join("");
-  const content = `<p class="eyebrow">Writing</p><h1>Blog</h1><p class="lead">${esc(site.blogIntro || "")}</p><ul class="posts">${items || "<li><p>No posts yet.</p></li>"}</ul>`;
-  return page({ title: `Blog · ${site.name}`, path: "/blog/", content });
+    `<li><a href="/blog/${p.slug}/"><span class="meta"><span>${fmtDate(p.date)}</span><span>${readTime(p.html)} min read</span></span><h2>${esc(p.title)}</h2><p>${esc(p.summary || "")}</p></a></li>`).join("");
+  const content = `<div class="blog-head"><h1>Blog</h1><p class="lead">${esc(site.blogIntro || "")}</p></div><ul class="posts">${items || "<li><p>No posts yet.</p></li>"}</ul>`;
+  return page({ title: `Blog | ${site.name}`, path: "/blog/", content });
 }
 
 function postPage(p) {
@@ -226,15 +224,15 @@ function postPage(p) {
     ? `<p class="source">Originally published on <a href="${esc(p.source)}">${esc(sourceName(p.source))}</a>.</p>`
     : "";
   const content = `<article>
-<div class="post-head"><p class="meta">${fmtDate(p.date)} · ${readTime(p.html)} min read</p><h1>${esc(p.title)}</h1>${p.summary ? `<p class="lead">${esc(p.summary)}</p>` : ""}</div>
+<div class="post-head"><p class="meta"><span>${fmtDate(p.date)}</span><span>${readTime(p.html)} min read</span></p><h1>${esc(p.title)}</h1>${p.summary ? `<p class="lead">${esc(p.summary)}</p>` : ""}</div>
 <div class="prose">${p.html}</div>
-${source}<a class="back" href="/blog/">← All posts</a>
+${source}<a class="back" href="/blog/">Back to all posts</a>
 </article>`;
-  return page({ title: `${p.title} · ${site.name}`, path: `/blog/${p.slug}/`, content, description: p.summary });
+  return page({ title: `${p.title} | ${site.name}`, path: `/blog/${p.slug}/`, content, description: p.summary });
 }
 
 function notFoundPage() {
-  return page({ title: `Not found · ${site.name}`, path: "", content: `<h1>Page not found</h1><p class="lead">That page doesn't exist. <a href="/">Go home</a>.</p>` });
+  return page({ title: `Not found | ${site.name}`, path: "", content: `<h1>Page not found</h1><p class="lead">That page doesn't exist. <a href="/">Go home</a>.</p>` });
 }
 
 function feed() {
