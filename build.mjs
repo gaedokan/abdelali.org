@@ -159,8 +159,8 @@ ${site.preview ? '<meta name="robots" content="noindex,nofollow">' : ""}
 ${canonical}
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description || site.description)}">
-<meta name="theme-color" content="#F6F7F9" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0F1218" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FBF8F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1917" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="${esc(site.name)}" href="/feed.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
