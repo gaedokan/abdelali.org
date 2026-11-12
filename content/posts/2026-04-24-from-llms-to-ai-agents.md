@@ -1,7 +1,6 @@
 ---
 title: From LLMs to AI Agents: A Simple Guide to the Biggest Shift in AI
 summary: Everyone is talking about AI agents. What actually are they, and how are they different from the chatbots we already use? A plain-language walk from language models to fully autonomous agents.
-source: https://medium.com/@gaedokan/from-llms-to-ai-agents-a-simple-guide-to-the-biggest-shift-in-ai-4a486039b45e
 ---
 
 If you've been paying attention to the AI world lately, you've probably heard the term "AI agent" thrown around everywhere. Companies are building them, engineers are hyped about them, and somehow they're supposed to be very different from the chatbots we've been using.
@@ -89,7 +88,7 @@ If someone asks "what makes a system an agent?", here are the five traits to loo
 
 Let's see the same request handled at three different levels. This is the clearest way to feel the difference.
 
-![The same request handled by an LLM, an LLM with function calling, and an AI agent](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*WFnnydBumvgmM_apDWyIzw.png)
+![The same request handled by an LLM, an LLM with function calling, and an AI agent](/images/llms-to-agents.png)
 
 Today's agents are good at narrow tasks but struggle with anything too open-ended or long-running. They make mistakes. They sometimes loop forever. They can't always tell when they're wrong.
 
