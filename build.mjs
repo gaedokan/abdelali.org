@@ -176,11 +176,10 @@ ${canonical}
 </html>`;
 }
 
-function icon(name, domain, size = "") {
-  const img = domain
-    ? `<img src="https://www.google.com/s2/favicons?domain=${esc(domain)}&sz=128" alt="" loading="lazy" onerror="this.remove()">`
-    : "";
-  return `<span class="icon ${size}" aria-hidden="true"><span class="mono">${esc(name[0])}</span>${img}</span>`;
+// App icon tile: the official icon from static/icons/ when there is one, otherwise a lettered tile.
+function icon(name, src) {
+  const img = src ? `<img src="${esc(src)}" alt="" width="64" height="64" loading="lazy">` : "";
+  return `<span class="icon" aria-hidden="true"><span class="mono">${esc(name[0])}</span>${img}</span>`;
 }
 
 // ------------------------------------------------------------------ pages
@@ -188,7 +187,7 @@ function icon(name, domain, size = "") {
 function aboutPage() {
   const a = about.data;
   const products = profile.products.map((p) =>
-    `<li>${icon(p.name, p.domain)}<strong>${esc(p.name)}</strong><span class="note">${esc(p.note)}</span></li>`).join("");
+    `<li>${icon(p.name, p.icon)}<strong>${esc(p.name)}</strong><span class="note">${esc(p.note)}</span></li>`).join("");
   const strengths = profile.strengths.map((s) => `<li><span class="bp" aria-hidden="true"></span>${esc(s)}</li>`).join("");
   const experience = profile.experience.map((e) => `
     <li><span class="when">${esc(e.dates)}</span>
