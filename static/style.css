@@ -128,3 +128,17 @@ h3{font-size:1.2rem;margin:0}
 footer{padding:2rem 0 3rem;color:var(--slate);font:400 .9rem/1.5 var(--display);border-top:1px solid var(--hair)}
 footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem}
 footer a{color:inherit}
+
+/* home: short intro, then the writing list */
+.home-intro h1{font-size:clamp(2.4rem,7vw,3.5rem);letter-spacing:-.035em;margin:0 0 1.5rem}
+.home-intro .prose p{margin:0 0 1rem;font-size:1.15rem}
+.home-intro .prose p:first-child{font-size:1.3rem;line-height:1.5}
+.home-intro strong{color:var(--signal-ink)}
+.home-intro .links{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;margin:1.5rem 0 0;font:500 1rem/1.4 var(--display)}
+.writing{margin-top:3.5rem;padding-top:2.5rem;border-top:1px solid var(--hair)}
+.writing h2{margin:0 0 1.5rem}
+.post-list{list-style:none;padding:0;margin:0;display:grid;gap:2rem}
+.post-list > li > a{font:650 1.3rem/1.3 var(--display);letter-spacing:-.015em;text-decoration:none;color:var(--signal-ink)}
+.post-list > li > a:hover{text-decoration:underline;text-decoration-thickness:2px}
+.post-list .meta{margin:.35rem 0 .3rem}
+.post-list .summary{margin:0;color:var(--slate);font-size:1.05rem;line-height:1.6}
