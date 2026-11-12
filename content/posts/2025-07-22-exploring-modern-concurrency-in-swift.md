@@ -1,7 +1,6 @@
 ---
 title: Exploring Modern Concurrency in Swift
 summary: A practical tour of Swift's modern concurrency — tasks, Sendable and actors, async let and task groups, continuations and async streams — with code you can run today.
-source: https://medium.com/@gaedokan/exploring-modern-concurrency-in-swift-part1-8b9d7c468406
 ---
 
 Swift 5.5 introduced robust and integrated tools for handling concurrency, simplifying how we work with asynchronous code. These new tools, built into the language, help prevent data races and allow us to write code that feels synchronous even when dealing with asynchronous operations.
