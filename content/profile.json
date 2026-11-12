@@ -1,0 +1,53 @@
+{
+  "productsIntro": "A few of the products I've helped build.",
+  "products": [
+    { "name": "Emirates", "note": "Commerce app", "domain": "emirates.com" },
+    { "name": "Nespresso", "note": "iOS architecture", "domain": "nespresso.com" },
+    { "name": "CHANEL", "note": "iOS architecture", "domain": "chanel.com" },
+    { "name": "eKare", "note": "Digital wound care", "domain": "ekare.ai" },
+    { "name": "MiMs", "note": "Biometrics · Morpho", "domain": "safran-group.com" }
+  ],
+  "strengths": [
+    "Swift & Objective-C",
+    "SwiftUI & UIKit",
+    "TCA, MVVM & reactive architecture",
+    "Performance & reliability",
+    "Unit testing & automation",
+    "Technical leadership & mentoring"
+  ],
+  "experience": [
+    {
+      "company": "SQLI",
+      "role": "Senior iOS Engineer / Technical Lead",
+      "dates": "2017 — Present",
+      "domain": "sqli.com",
+      "text": "Joined as an iOS developer and grew into technical lead for the Rabat team. Designing maintainable architectures for clients including Nespresso and CHANEL, building custom interactions for complex product flows, and raising the bar on code quality through reviews, testing and engineering standards."
+    },
+    {
+      "company": "Omnevo",
+      "role": "iOS Developer",
+      "dates": "2023 — 2025",
+      "text": "Built and evolved the Emirates iOS commerce app — improving product discovery, selection and checkout, strengthening the architecture for faster delivery, and working closely with product, design, backend and QA."
+    },
+    {
+      "company": "Masarat App",
+      "role": "iOS / Web Developer for eKare",
+      "dates": "2015 — 2017",
+      "text": "Partnered with a US health-tech startup and its UX team to turn the product vision into an iOS and web experience for digital wound care."
+    },
+    {
+      "company": "Morpho (Safran)",
+      "role": "iOS Consultant",
+      "dates": "2015",
+      "domain": "safran-group.com",
+      "text": "Built features for the MiMs biometric application across Windows Mobile, Android and iOS, from service integration to business logic and UI."
+    },
+    {
+      "company": "Dial Technologies",
+      "role": "iOS Developer · Award-winning apps",
+      "dates": "2012 — 2015",
+      "text": "Worked across several mobile platforms before focusing on iOS. Led multiple mobile projects, improved map navigation performance, and contributed to an app for a major insurance company."
+    }
+  ],
+  "education": "Studied at the National School of Applied Sciences of Tangier."
+}
