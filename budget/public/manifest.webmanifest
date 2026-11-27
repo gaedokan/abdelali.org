@@ -1,0 +1,19 @@
+{
+  "name": "Envelope budget",
+  "short_name": "Envelope",
+  "description": "Personal zero-based budget",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./",
+  "background_color": "#f6f4ef",
+  "theme_color": "#1c2b27",
+  "shortcuts": [
+    { "name": "Add transaction", "url": "./#/add" },
+    { "name": "Budget", "url": "./#/budget" }
+  ],
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

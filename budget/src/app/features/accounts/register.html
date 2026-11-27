@@ -1,0 +1,186 @@
+<div class="page">
+  <header class="head">
+    <div class="title">
+      <div>
+        <h1>{{ account()?.name ?? 'All accounts' }}</h1>
+        @if (account(); as a) {
+          <span class="sub">{{ typeLabel() }} · {{ a.onBudget ? 'Budget account' : 'Tracking account' }}@if (a.closed) { · Closed }</span>
+        } @else { <span class="sub">Every budget account in one list</span> }
+      </div>
+      @if (account(); as a) {
+        <button class="btn sm ghost" type="button" (click)="ui.editAccountId.set(a.id)"><app-icon name="edit" [size]="14" /> Edit</button>
+      }
+    </div>
+    <div class="balances">
+      <div><span>Cleared</span><strong class="num">{{ balance().cleared | money }}</strong></div>
+      <div class="op">+</div>
+      <div><span>Uncleared</span><strong class="num">{{ balance().uncleared | money }}</strong></div>
+      <div class="op">=</div>
+      <div class="working" [class.neg]="balance().working < 0"><span>Working balance</span><strong class="num">{{ balance().working | money }}</strong></div>
+      @if (cardInfo(); as ci) {
+        <a class="cc" routerLink="/budget"><span>Set aside for payment</span><strong class="num">{{ ci.available | money }}</strong></a>
+      }
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn primary" type="button" (click)="add()"><app-icon name="plus" [size]="16" /> Add transaction</button>
+    @if (account()?.type === 'cash') {
+      <button class="btn" type="button" (click)="openAtm()"><app-icon name="cash" [size]="16" /> ATM withdrawal</button>
+    }
+    <button class="btn" type="button" (click)="ui.importFor.set(account()?.id ?? null)"><app-icon name="import" [size]="16" /> Import</button>
+    @if (account()) { <button class="btn" type="button" (click)="openReconcile()"><app-icon name="lock" [size]="15" /> Reconcile</button> }
+    <span class="grow"></span>
+    <div class="search"><app-icon name="search" [size]="15" /><input class="input" placeholder="Search payee, category, memo, amount" [value]="search()" (input)="search.set($any($event.target).value); limit.set(150)" /></div>
+  </div>
+
+  <div class="chips">
+    <button class="chip" [class.on]="view() === 'all'" (click)="view.set('all')">All</button>
+    <button class="chip" [class.on]="view() === 'review'" (click)="view.set('review')">To review @if (reviewCount()) {<span class="count">{{ reviewCount() }}</span>}</button>
+    <button class="chip" [class.on]="view() === 'uncleared'" (click)="view.set('uncleared')">Uncleared</button>
+    <button class="chip" [class.on]="view() === 'flagged'" (click)="view.set('flagged')">Flagged</button>
+    @if (unapprovedIds().length) {
+      <span class="grow"></span>
+      <button class="btn sm" type="button" (click)="approveAll()"><app-icon name="check" [size]="14" /> Approve all {{ unapprovedIds().length }}</button>
+    }
+  </div>
+
+  @if (selCount()) {
+    <div class="bulkbar">
+      <strong>{{ selCount() }} selected</strong><span class="muted num">{{ selTotal() | money }}</span>
+      <span class="grow"></span>
+      <div class="bulk-cat"><app-combo [compact]="true" [items]="categoryItems()" [(value)]="bulkCategory" placeholder="Categorise as…" (picked)="bulk('category')" /></div>
+      <button class="btn sm" type="button" (click)="bulk('approve')">Approve</button>
+      <button class="btn sm" type="button" (click)="bulk('clear')">Cleared</button>
+      <button class="btn sm" type="button" (click)="bulk('unclear')">Uncleared</button>
+      <button class="btn sm danger" type="button" (click)="bulk('delete')"><app-icon name="trash" [size]="14" /> Delete</button>
+      <button class="btn sm ghost icon" type="button" (click)="clearSel()" aria-label="Clear selection"><app-icon name="x" [size]="14" /></button>
+    </div>
+  }
+
+  <div class="table" [style.--reg-cols]="cols()">
+    @if (wide()) {
+      <div class="thead">
+        <div class="c-sel"><input type="checkbox" [checked]="allSelected()" (change)="toggleAll()" aria-label="Select all" /></div>
+        <div class="c-flag"></div>
+        <div class="c-date">Date</div>
+        @if (!account()) { <div class="c-acct">Account</div> }
+        <div class="c-payee">Payee</div>
+        <div class="c-cat">Category</div>
+        <div class="c-memo">Memo</div>
+        <div class="c-out num">Outflow</div>
+        <div class="c-in num">Inflow</div>
+        @if (account()) { <div class="c-bal num">Balance</div> }
+        <div class="c-clr"></div>
+      </div>
+    }
+
+    @if (editing() === 'new') {
+      <app-txn-form layout="row" [accountId]="account()?.id ?? null" [showAccount]="!account()" (saved)="editing.set(null)" (cancelled)="editing.set(null)" (saveAndNew)="editing.set('new')" />
+    }
+
+    @for (s of upcoming(); track s.id) {
+      <div class="line upcoming">
+        <div class="c-sel"><app-icon name="repeat" [size]="13" /></div>
+        <div class="c-flag"></div>
+        <div class="c-date">{{ s.nextDate | date }}</div>
+        @if (!account()) { <div class="c-acct">{{ accountName(s.accountId) }}</div> }
+        <div class="c-payee">{{ s.transferAccountId ? 'Transfer: ' + accountName(s.transferAccountId) : payeeOf(s.payeeId) }}</div>
+        <div class="c-cat"><span class="tag">Upcoming</span></div>
+        <div class="c-memo up-actions"><button class="btn sm ghost" type="button" (click)="enterScheduled(s.id)">Enter now</button><button class="btn sm ghost" type="button" (click)="skipScheduled(s.id)">Skip</button></div>
+        <div class="c-out num">{{ s.amount < 0 ? (-s.amount | money:'plain') : '' }}</div>
+        <div class="c-in num">{{ s.amount > 0 ? (s.amount | money:'plain') : '' }}</div>
+        @if (account()) { <div class="c-bal"></div> }
+        <div class="c-clr"></div>
+      </div>
+    }
+
+    @for (l of shown(); track l.t.id) {
+      @if (editing() === l.t.id) {
+        <app-txn-form layout="row" [txnId]="l.t.id" [showAccount]="!account()" (saved)="editing.set(null)" (cancelled)="editing.set(null)" />
+      } @else {
+        <div class="line" [class.unapproved]="!l.t.approved" [class.sel]="selected().has(l.t.id)" [class.future]="l.t.date > today" (click)="edit(l, $event)">
+          <div class="c-sel"><input type="checkbox" [checked]="selected().has(l.t.id)" (click)="toggleSel(l.t.id, $event)" aria-label="Select" /></div>
+          <div class="c-flag">@if (l.t.flag) { <i class="flag" [attr.data-c]="l.t.flag"></i> }</div>
+          <div class="c-date">{{ l.t.date | date }}</div>
+          @if (!account()) { <div class="c-acct ell">{{ l.account }}</div> }
+          <div class="c-payee ell">
+            @if (l.transfer) { <app-icon name="transfer" [size]="13" class="tr" /> }
+            <span>{{ l.payee }}</span>
+            @if (l.t.source === 'wallet') { <span class="src" title="Added from Apple Wallet">Wallet</span> }
+          </div>
+          <div class="c-cat ell" [class.missing]="!l.category && !l.transfer && account()?.onBudget !== false && l.t.source !== 'start'">
+            {{ l.category || (!l.transfer && l.t.source !== 'start' && (account()?.onBudget ?? true) ? 'Needs a category' : '') }}
+          </div>
+          <div class="c-memo ell muted">{{ l.t.memo }}</div>
+          <div class="c-out num">{{ l.t.amount < 0 ? (-l.t.amount | money:'plain') : '' }}</div>
+          <div class="c-in num amt-pos">{{ l.t.amount > 0 ? (l.t.amount | money:'plain') : '' }}</div>
+          @if (account()) { <div class="c-bal num" [class.amt-neg]="(l.balance ?? 0) < 0">{{ l.balance | money:'plain' }}</div> }
+          <div class="c-clr">
+            @if (!l.t.approved) {
+              <button class="approve" type="button" (click)="approve(l.t.id, $event)" title="Approve"><app-icon name="check" [size]="13" [stroke]="3" /></button>
+            } @else if (l.t.cleared === 'reconciled') {
+              <span class="clr rec" title="Reconciled"><app-icon name="lock" [size]="11" /></span>
+            } @else {
+              <button class="clr" [class.on]="l.t.cleared === 'cleared'" type="button" (click)="toggleCleared(l.t.id, $event)" [title]="l.t.cleared === 'cleared' ? 'Cleared' : 'Uncleared'">C</button>
+            }
+          </div>
+          <!-- phone layout -->
+          <div class="m-main">
+            <span class="m-payee">@if (!l.t.approved) {<i class="newdot"></i>}{{ l.payee || 'No payee' }}</span>
+            <span class="m-sub">{{ l.category || (l.transfer ? '' : 'Needs a category') }}@if (!account()) { · {{ l.account }} } · {{ l.t.date | date }}</span>
+          </div>
+          <div class="m-amt num" [class.amt-pos]="l.t.amount > 0">{{ l.t.amount | money:'plain' }}</div>
+        </div>
+      }
+    } @empty {
+      @if (editing() !== 'new') {
+        <div class="empty">
+          @if (search() || view() !== 'all') { <h3>Nothing matches</h3><p>Try another search or filter.</p> }
+          @else {
+            <h3>No transactions yet</h3>
+            <p>Add your first one, import a bank file, or set up the iPhone Wallet shortcut in Settings to log card payments automatically.</p>
+            <button class="btn primary" type="button" (click)="add()">Add transaction</button>
+          }
+        </div>
+      }
+    }
+    @if (lines().length > shown().length) {
+      <button class="more" type="button" (click)="limit.set(limit() + 300)">Show more ({{ lines().length - shown().length }} older)</button>
+    }
+  </div>
+</div>
+
+<app-sheet [open]="reconcileOpen()" title="Reconcile {{ account()?.name }}" (closed)="reconcileOpen.set(false)">
+  @if (reconcileStep() === 'ask') {
+    <p class="rq">Is your <strong>cleared</strong> balance on your bank statement or app</p>
+    <p class="rbig num">{{ balance().cleared | money }}?</p>
+    <div class="row end">
+      <button class="btn" type="button" (click)="reconcileStep.set('enter')">No</button>
+      <button class="btn primary" type="button" (click)="reconcile(true)">Yes, it matches</button>
+    </div>
+  } @else {
+    <form class="stack" (submit)="$event.preventDefault(); reconcile(false)">
+      <label class="field"><span>What is the balance at your bank?</span><input class="input amount" [value]="bankBalance()" (input)="bankBalance.set($any($event.target).value)" inputmode="decimal" autofocus /></label>
+      @if (reconcileDiff(); as d) {
+        <p class="muted small">Difference {{ d | money }}. Check for missing or uncleared transactions first — otherwise an adjustment will be added (to Ready to Assign for budget accounts).</p>
+      }
+      <div class="row end">
+        <button class="btn" type="button" (click)="reconcileStep.set('ask')">Back</button>
+        <button class="btn primary" type="submit" [disabled]="reconcileDiff() === null">{{ reconcileDiff() ? 'Add adjustment & reconcile' : 'Reconcile' }}</button>
+      </div>
+    </form>
+  }
+</app-sheet>
+
+<app-sheet [open]="atmOpen()" title="ATM withdrawal" (closed)="atmOpen.set(false)">
+  <form class="stack" data-form (submit)="$event.preventDefault(); saveAtm()">
+    <p class="muted small">Moves money from your bank into {{ account()?.name }}. It’s a transfer, so it doesn’t touch your budget — you categorise when you spend the cash.</p>
+    <label class="field"><span>Amount</span><input class="input amount" [value]="atmAmount()" (input)="atmAmount.set($any($event.target).value)" inputmode="decimal" placeholder="200" autofocus /></label>
+    <label class="field"><span>From</span><app-combo [items]="atmItems()" [(value)]="atmFrom" placeholder="Bank account" /></label>
+    <div class="quick-amts">
+      @for (v of [100, 200, 500, 1000, 2000]; track v) { <button class="chip" type="button" (click)="atmAmount.set('' + v)">{{ v }}</button> }
+    </div>
+    <div class="row end"><button class="btn" type="button" (click)="atmOpen.set(false)">Cancel</button><button class="btn primary" type="submit" [disabled]="!atmFrom()">Record withdrawal</button></div>
+  </form>
+</app-sheet>

@@ -1,0 +1,199 @@
+@if (cat(); as c) {
+  <div class="insp">
+    <header class="ihead">
+      <button class="emoji-btn" type="button" (click)="showEmoji.set(!showEmoji())" title="Choose an icon">{{ c.emoji || '＋' }}</button>
+      <input class="title-input" [value]="c.name" (change)="rename($any($event.target).value)" (keydown.enter)="$any($event.target).blur()" aria-label="Category name" />
+      <button class="btn ghost icon sm" type="button" (click)="closed.emit()" aria-label="Close"><app-icon name="x" [size]="16" /></button>
+    </header>
+    @if (showEmoji()) {
+      <div class="emoji-grid">
+        @for (e of emojis; track e) { <button type="button" (click)="setEmoji(e)">{{ e }}</button> }
+        <button type="button" class="none" (click)="setEmoji(undefined)">None</button>
+      </div>
+    }
+
+    <section class="avail" [class.neg]="cm().available < 0" [class.pos]="cm().available > 0">
+      <span class="lbl">Available</span>
+      <strong class="num">{{ cm().available | money }}</strong>
+      <div class="avail-actions">
+        <button class="btn sm" type="button" (click)="moveMoney.emit({ from: c.id })"><app-icon name="transfer" [size]="14" /> Move money</button>
+      </div>
+    </section>
+
+    <dl class="breakdown">
+      <div><dt>From {{ prevName() }}</dt><dd class="num">{{ cm().carry | money:'plain' }}</dd></div>
+      <div class="assign-line"><dt>Assigned in {{ label() }}</dt>
+        <dd><input class="input amount sm-input" [value]="cm().assigned | money:'plain'" (change)="assign($any($event.target).value)" (keydown.enter)="$any($event.target).blur()" inputmode="decimal" aria-label="Assigned" /></dd></div>
+      <div><dt>Activity</dt><dd class="num">{{ cm().activity | money:'plain' }}</dd></div>
+      @if (cm().movedToCards) { <div class="sub"><dt>Moved to card payments</dt><dd class="num">{{ cm().movedToCards | money:'plain' }}</dd></div> }
+      @if (cm().cashOver) { <div class="warnline neg"><dt>Overspent (cash)</dt><dd class="num">{{ cm().cashOver | money:'plain' }}</dd></div> }
+      @if (cm().creditOver) { <div class="warnline credit"><dt>Overspent on credit</dt><dd class="num">{{ cm().creditOver | money:'plain' }}</dd></div> }
+    </dl>
+
+    @if (isCard()) {
+      <section class="card-info">
+        <h3 class="section-title">Card payment</h3>
+        <p>Card balance <strong class="num">{{ cardBalance() | money }}</strong>.
+          @if (-cardBalance() > cm().available) { You have {{ cm().available | money }} set aside: assign {{ -cardBalance() - cm().available | money }} more to pay it off in full. }
+          @else if (cardBalance() < 0) { You can pay this card in full. }
+        </p>
+        @if (-cardBalance() > cm().available) {
+          <button class="btn sm" type="button" (click)="assign(((cm().assigned + (-cardBalance() - cm().available)) / 100).toString())">Assign the difference</button>
+        }
+      </section>
+    } @else {
+      <section class="target">
+        <h3 class="section-title">Target</h3>
+        @if (!editingTarget()) {
+          @if (c.target) {
+            <div class="t-summary">
+              <app-ring [value]="ringValue()" [size]="44" [tone]="cm().available < 0 ? 'neg' : (cmTarget()?.underfunded ? 'warn' : 'pos')" />
+              <div>
+                <strong>{{ targetSummary(c.target) }}</strong>
+                @if (cmTarget(); as t) {
+                  @if (t.underfunded > 0) { <span class="warn">Assign {{ t.underfunded | money }} more this month</span> }
+                  @else if (t.type === 'balance') { <span class="muted">{{ (t.progress * 100).toFixed(0) }}% there</span> }
+                  @else { <span class="pos">Funded for {{ label() }}</span> }
+                  @if (t.monthsLeft) { <span class="muted">{{ t.need | money }} / month · {{ t.monthsLeft }} month{{ t.monthsLeft === 1 ? '' : 's' }} left</span> }
+                }
+              </div>
+            </div>
+            <div class="row">
+              @if (cmTarget()?.underfunded) { <button class="btn sm primary" type="button" (click)="strategy.emit({ s: 'underfunded', id: c.id })">Assign {{ cmTarget()!.underfunded | money:'plain' }}</button> }
+              <button class="btn sm" type="button" (click)="editTarget()">Edit</button>
+            </div>
+          } @else {
+            <p class="muted small">How much does this category need? A target tells you what to assign each month.</p>
+            <button class="btn sm" type="button" (click)="editTarget()"><app-icon name="target" [size]="14" /> Create target</button>
+          }
+        } @else {
+          <div class="t-edit" data-form>
+            <div class="seg block wrap">
+              <button type="button" [class.on]="tType() === 'monthly'" (click)="tType.set('monthly')">Monthly</button>
+              <button type="button" [class.on]="tType() === 'weekly'" (click)="tType.set('weekly')">Weekly</button>
+              <button type="button" [class.on]="tType() === 'byDate'" (click)="tType.set('byDate')">By date</button>
+              <button type="button" [class.on]="tType() === 'yearly'" (click)="tType.set('yearly')">Yearly</button>
+              <button type="button" [class.on]="tType() === 'balance'" (click)="tType.set('balance')">Balance</button>
+            </div>
+            <label class="field"><span>Amount</span><input class="input amount" [value]="tAmount()" (input)="tAmount.set($any($event.target).value)" inputmode="decimal" placeholder="0,00" /></label>
+            @if (tType() === 'monthly' || tType() === 'weekly') {
+              <div class="seg block">
+                <button type="button" [class.on]="tMode() === 'set'" (click)="tMode.set('set')">Set aside</button>
+                <button type="button" [class.on]="tMode() === 'refill'" (click)="tMode.set('refill')">Refill up to</button>
+              </div>
+              <p class="hint">{{ tMode() === 'set' ? 'Assign this amount every month, even if money is left over.' : 'Top the category up to this amount; leftovers count.' }}</p>
+            }
+            @if (tType() === 'weekly') {
+              <label class="field"><span>Every</span><select class="select" [value]="tWeekday()" (change)="tWeekday.set(+$any($event.target).value)">@for (d of weekdays; track $index) {<option [value]="$index">{{ d }}</option>}</select></label>
+            }
+            @if (tType() === 'byDate') {
+              <label class="field"><span>By</span><input class="input" type="month" [value]="tDate()" (change)="tDate.set($any($event.target).value)" /></label>
+            }
+            @if (tType() === 'yearly') {
+              <label class="field"><span>Due every</span><select class="select" [value]="tMonth()" (change)="tMonth.set(+$any($event.target).value)">@for (m of monthNames; track $index) {<option [value]="$index + 1">{{ m }}</option>}</select></label>
+            }
+            <div class="row">
+              <button class="btn sm primary" type="button" (click)="saveTarget()">Save target</button>
+              <button class="btn sm ghost" type="button" (click)="editingTarget.set(false)">Cancel</button>
+              <span class="grow"></span>
+              @if (c.target) { <button class="btn sm danger" type="button" (click)="removeTarget()">Remove</button> }
+            </div>
+          </div>
+        }
+      </section>
+
+      <section>
+        <h3 class="section-title">Quick assign</h3>
+        <div class="quick">
+          @for (s of strategyValues(); track s.id) {
+            @if (s.id !== 'underfunded' || c.target) {
+              <button type="button" (click)="strategy.emit({ s: s.id, id: c.id })" [disabled]="!s.delta">
+                <span>{{ s.label }}</span><span class="num">{{ s.total | money:'plain' }}</span>
+              </button>
+            }
+          }
+        </div>
+      </section>
+    }
+
+    <section>
+      <h3 class="section-title">This month</h3>
+      @for (r of recent(); track r.t.id) {
+        <a class="tx" [routerLink]="['/accounts', r.t.accountId]" [queryParams]="{ q: r.payee }">
+          <span class="tx-main"><strong>{{ r.payee || 'No payee' }}</strong><small>{{ r.t.date | date }} · {{ r.account }}</small></span>
+          <span class="num" [class.amt-neg]="r.amount < 0" [class.amt-pos]="r.amount > 0">{{ r.amount | money:'plain' }}</span>
+        </a>
+      } @empty { <p class="muted small">No transactions yet.</p> }
+    </section>
+
+    <section>
+      <h3 class="section-title">Notes</h3>
+      <textarea class="input" rows="3" [value]="c.note ?? ''" (change)="saveNote($any($event.target).value)" placeholder="Anything to remember…"></textarea>
+    </section>
+
+    @if (!isCard()) {
+      <section class="danger-zone">
+        @if (!confirmDelete()) {
+          <button class="btn sm ghost" type="button" (click)="hide()"><app-icon name="eye-off" [size]="14" /> Hide</button>
+          <button class="btn sm ghost danger" type="button" (click)="confirmDelete.set(true)"><app-icon name="trash" [size]="14" /> Delete</button>
+        } @else {
+          <div class="stack">
+            <p class="small">Move this category’s transactions and assigned money to:</p>
+            <app-combo [items]="replacementItems()" [(value)]="replacement" placeholder="Choose a category (or leave uncategorised)" />
+            <div class="row"><button class="btn sm danger" type="button" (click)="remove()">Delete “{{ c.name }}”</button><button class="btn sm ghost" type="button" (click)="confirmDelete.set(false)">Cancel</button></div>
+          </div>
+        }
+      </section>
+    }
+  </div>
+} @else if (categoryId() === 'uncat') {
+  <div class="insp">
+    <header class="ihead"><h2>Uncategorised</h2><button class="btn ghost icon sm" type="button" (click)="closed.emit()" aria-label="Close"><app-icon name="x" [size]="16" /></button></header>
+    <p class="muted small">These transactions don’t have a category yet. Open them in their account to categorise.</p>
+    @for (r of recent(); track r.t.id) {
+      <a class="tx" [routerLink]="['/accounts', r.t.accountId]">
+        <span class="tx-main"><strong>{{ r.payee || 'No payee' }}</strong><small>{{ r.t.date | date }} · {{ r.account }}</small></span>
+        <span class="num" [class.amt-neg]="r.amount < 0">{{ r.amount | money:'plain' }}</span>
+      </a>
+    }
+  </div>
+} @else {
+  <div class="insp">
+    <header class="ihead"><h2>{{ label() }}</h2></header>
+    <dl class="breakdown big">
+      <div><dt>Income</dt><dd class="num">{{ md().income | money:'plain' }}</dd></div>
+      <div><dt>Assigned</dt><dd class="num">{{ md().assigned | money:'plain' }}</dd></div>
+      <div><dt>Activity</dt><dd class="num">{{ md().activity | money:'plain' }}</dd></div>
+      <div><dt>Available in categories</dt><dd class="num">{{ md().available | money:'plain' }}</dd></div>
+      @if (md().assignedInFuture) { <div class="sub"><dt>Assigned in future months</dt><dd class="num">{{ md().assignedInFuture | money:'plain' }}</dd></div> }
+    </dl>
+
+    @if (md().underfunded > 0) {
+      <button class="fund-card" type="button" (click)="fund.emit()">
+        <app-icon name="zap" [size]="18" />
+        <span><strong>{{ md().underfunded | money }}</strong> needed to fund every target</span>
+        <app-icon name="chevron-right" [size]="16" />
+      </button>
+    }
+
+    <section>
+      <h3 class="section-title">Quick assign · whole month</h3>
+      <div class="quick">
+        @for (s of strategyValues(); track s.id) {
+          <button type="button" (click)="s.id === 'underfunded' ? fund.emit() : strategy.emit({ s: s.id })" [disabled]="!s.delta">
+            <span>{{ s.label }}</span><span class="num">{{ s.delta >= 0 ? '+' : '' }}{{ s.delta | money:'plain' }}</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="insights">
+      <h3 class="section-title">Health</h3>
+      <div class="ins-grid">
+        <div class="ins"><app-icon name="calendar" [size]="18" /><strong>{{ insights().age ?? '—' }}</strong><span>Age of money (days)</span></div>
+        <div class="ins"><app-icon name="piggy" [size]="18" /><strong>{{ insights().buffer ?? '—' }}</strong><span>Days your cash would last</span></div>
+      </div>
+      <p class="muted small tip"><app-icon name="idea" [size]="14" /> Aim for 30+ days: you’re then spending money you earned last month, not this month.</p>
+    </section>
+  </div>
+}
