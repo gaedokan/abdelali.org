@@ -85,6 +85,19 @@ describe('budget engine', () => {
     expect(s.cat('2026-01', 'bills').target!.underfunded).toBe(3000);
     expect(s.month('2026-01').underfunded).toBe(23000);
   });
+
+  it('repeats custom targets and spreads savings deadlines', () => {
+    const cats = [
+      cat('ins', { target: { type: 'byDate', amount: 60000, date: '2026-03', repeatMonths: 6 } }),
+      cat('emerg', { target: { type: 'balance', amount: 100000, date: '2026-04' } }),
+    ];
+    const s = computeBudget({ accounts, categories: cats, txns: [], assigns: [asg('2026-01', 'ins', 0), asg('2026-01', 'emerg', 1)] }, '2026-05');
+    // 2026-05 is after March: the next occurrence is September (5 months left)
+    expect(s.cat('2026-05', 'ins').target!.monthsLeft).toBe(5);
+    expect(s.cat('2026-05', 'ins').target!.need).toBe(12000);
+    expect(s.cat('2026-01', 'emerg').target!.need).toBe(25000);
+    expect(s.cat('2026-01', 'emerg').target!.underfunded).toBe(24999);
+  });
 });
 
 describe('parsing', () => {

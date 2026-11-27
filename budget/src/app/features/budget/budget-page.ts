@@ -14,6 +14,8 @@ import { Sheet } from '../../ui/sheet';
 import { Toasts } from '../../ui/toast';
 import { UiState } from '../../ui/ui-state';
 import { Inspector } from './inspector';
+import { dueHint } from '../../core/target-text';
+import { targetMonth } from '../../core/engine';
 import { MoveMoney } from './move-money';
 
 type Filter = 'all' | 'underfunded' | 'overspent' | 'available';
@@ -321,13 +323,15 @@ export class BudgetPage {
     if (cm.available < 0) return cm.cashOver > 0 ? 'Overspent — cover it from another category' : 'Overspent on credit — this became card debt';
     if (r.cat.ccAccountId) return cm.available > 0 ? 'Set aside for your card payment' : '';
     const t = cm.target;
-    if (!t) return '';
+    const def = r.cat.target;
+    if (!t || !def) return '';
+    const due = dueHint(def, targetMonth(def, this.month()));
     if (t.underfunded > 0) {
-      if (t.type === 'byDate' || t.type === 'yearly') return `${this.fmt(t.underfunded)} more this month · ${t.monthsLeft} month${t.monthsLeft === 1 ? '' : 's'} left`;
-      return `${this.fmt(t.underfunded)} more needed`;
+      if (t.monthsLeft) return `${this.fmt(t.underfunded)} more this month · ${due}`;
+      return `${this.fmt(t.underfunded)} more needed${due ? ' ' + due : ''}`;
     }
-    if (t.type === 'balance') return t.done ? 'Goal reached' : `${Math.round(t.progress * 100)}% of ${this.fmt(t.goal ?? 0)}`;
-    if (t.type === 'byDate' || t.type === 'yearly') return t.done ? 'Fully funded' : `On track · ${Math.round(t.progress * 100)}% saved`;
+    if (t.type === 'balance' && !t.monthsLeft) return t.done ? 'Goal reached' : `${Math.round(t.progress * 100)}% of ${this.fmt(t.goal ?? 0)}`;
+    if (t.monthsLeft) return t.done ? 'Fully funded' : `On track · ${Math.round(t.progress * 100)}% saved · ${due}`;
     return 'Funded';
   }
   private money = new MoneyPipe();

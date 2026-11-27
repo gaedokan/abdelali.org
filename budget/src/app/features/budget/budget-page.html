@@ -114,6 +114,7 @@
                       @if (r.cm.target) { <app-ring [value]="ringValue(r.cm)" [tone]="ringTone(r.cm)" [size]="15" /> }
                     </div>
                     @if (status(r); as s) { <div class="status" [class]="tone(r.cm)">{{ s }}</div> }
+                    <div class="m-sub num">Assigned {{ r.cm.assigned | money:'plain' }} · @if (r.cat.ccAccountId) { Activity {{ r.cm.activity | money:'plain' }} } @else { Spent {{ -r.cm.activity | money:'plain' }} }</div>
                     <div class="bar"><i [style.width.%]="barWidth(r.cm)" [class]="tone(r.cm)"></i></div>
                   </div>
                 </div>

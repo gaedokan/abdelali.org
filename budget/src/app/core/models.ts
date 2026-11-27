@@ -71,11 +71,15 @@ export interface Target {
   amount: number;
   /** monthly/weekly: 'set' = assign this every month, 'refill' = top up to this amount */
   mode?: 'set' | 'refill';
-  /** byDate: 'YYYY-MM'; yearly: month number 1-12 */
+  /** byDate / balance (optional deadline): 'YYYY-MM'; yearly: month number 1-12 */
   date?: string;
   month?: number;
+  /** monthly / yearly: due day of month 1-31 (31 = last day) */
+  day?: number;
   /** weekly: weekday 0-6 (Sun-Sat) */
   weekday?: number;
+  /** byDate ("custom"): repeat every N months after the date passes (0/undefined = no repeat) */
+  repeatMonths?: number;
 }
 
 export interface Category extends Base {

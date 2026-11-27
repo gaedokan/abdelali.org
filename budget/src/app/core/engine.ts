@@ -279,7 +279,16 @@ function projectMonth(prev: MonthData, m: string, categories: Category[]): Month
 // ------------------------------------------------------------------ targets
 
 export function targetMonth(t: Target, month: string): string | null {
-  if (t.type === 'byDate') return t.date ?? null;
+  if (t.type === 'byDate' || t.type === 'balance') {
+    if (!t.date) return null;
+    let tm = t.date;
+    // repeating custom target: the next occurrence on or after this month
+    if (t.type === 'byDate' && t.repeatMonths && t.repeatMonths > 0) {
+      let guard = 0;
+      while (tm < month && guard++ < 1200) tm = addMonths(tm, t.repeatMonths);
+    }
+    return tm;
+  }
   if (t.type === 'yearly') {
     const mm = String(t.month ?? 12).padStart(2, '0');
     const y = Number(month.slice(0, 4));
@@ -319,6 +328,15 @@ export function targetStatus(t: Target, month: string, cm: Pick<CatMonth, 'carry
     }
     case 'balance': {
       const goal = t.amount;
+      const tm = targetMonth(t, month);
+      if (tm && month <= tm) {
+        // savings balance with a deadline: spread what is missing over the months left
+        const monthsLeft = monthDiff(month, tm) + 1;
+        const start = Math.max(0, cm.carry);
+        const perMonth = Math.max(0, Math.ceil((goal - start) / monthsLeft));
+        const under = Math.max(0, perMonth - cm.assigned);
+        return { type: 'balance', need: perMonth, underfunded: under, progress: goal ? clamp((start + cm.assigned) / goal) : 1, goal, monthsLeft, done: start + cm.assigned >= goal };
+      }
       return { type: 'balance', need: 0, underfunded: 0, progress: goal ? clamp(cm.available / goal) : 1, goal, done: cm.available >= goal };
     }
   }

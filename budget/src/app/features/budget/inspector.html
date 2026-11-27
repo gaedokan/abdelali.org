@@ -60,45 +60,14 @@
             </div>
             <div class="row">
               @if (cmTarget()?.underfunded) { <button class="btn sm primary" type="button" (click)="strategy.emit({ s: 'underfunded', id: c.id })">Assign {{ cmTarget()!.underfunded | money:'plain' }}</button> }
-              <button class="btn sm" type="button" (click)="editTarget()">Edit</button>
+              <button class="btn sm" type="button" (click)="editingTarget.set(true)">Edit</button>
             </div>
           } @else {
             <p class="muted small">How much does this category need? A target tells you what to assign each month.</p>
-            <button class="btn sm" type="button" (click)="editTarget()"><app-icon name="target" [size]="14" /> Create target</button>
+            <button class="btn sm" type="button" (click)="editingTarget.set(true)"><app-icon name="target" [size]="14" /> Create target</button>
           }
         } @else {
-          <div class="t-edit" data-form>
-            <div class="seg block wrap">
-              <button type="button" [class.on]="tType() === 'monthly'" (click)="tType.set('monthly')">Monthly</button>
-              <button type="button" [class.on]="tType() === 'weekly'" (click)="tType.set('weekly')">Weekly</button>
-              <button type="button" [class.on]="tType() === 'byDate'" (click)="tType.set('byDate')">By date</button>
-              <button type="button" [class.on]="tType() === 'yearly'" (click)="tType.set('yearly')">Yearly</button>
-              <button type="button" [class.on]="tType() === 'balance'" (click)="tType.set('balance')">Balance</button>
-            </div>
-            <label class="field"><span>Amount</span><input class="input amount" [value]="tAmount()" (input)="tAmount.set($any($event.target).value)" inputmode="decimal" placeholder="0,00" /></label>
-            @if (tType() === 'monthly' || tType() === 'weekly') {
-              <div class="seg block">
-                <button type="button" [class.on]="tMode() === 'set'" (click)="tMode.set('set')">Set aside</button>
-                <button type="button" [class.on]="tMode() === 'refill'" (click)="tMode.set('refill')">Refill up to</button>
-              </div>
-              <p class="hint">{{ tMode() === 'set' ? 'Assign this amount every month, even if money is left over.' : 'Top the category up to this amount; leftovers count.' }}</p>
-            }
-            @if (tType() === 'weekly') {
-              <label class="field"><span>Every</span><select class="select" [value]="tWeekday()" (change)="tWeekday.set(+$any($event.target).value)">@for (d of weekdays; track $index) {<option [value]="$index">{{ d }}</option>}</select></label>
-            }
-            @if (tType() === 'byDate') {
-              <label class="field"><span>By</span><input class="input" type="month" [value]="tDate()" (change)="tDate.set($any($event.target).value)" /></label>
-            }
-            @if (tType() === 'yearly') {
-              <label class="field"><span>Due every</span><select class="select" [value]="tMonth()" (change)="tMonth.set(+$any($event.target).value)">@for (m of monthNames; track $index) {<option [value]="$index + 1">{{ m }}</option>}</select></label>
-            }
-            <div class="row">
-              <button class="btn sm primary" type="button" (click)="saveTarget()">Save target</button>
-              <button class="btn sm ghost" type="button" (click)="editingTarget.set(false)">Cancel</button>
-              <span class="grow"></span>
-              @if (c.target) { <button class="btn sm danger" type="button" (click)="removeTarget()">Remove</button> }
-            </div>
-          </div>
+          <app-target-editor [category]="c" [forMonth]="month()" (done)="editingTarget.set(false)" />
         }
       </section>
 

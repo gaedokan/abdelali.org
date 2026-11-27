@@ -12,13 +12,16 @@ import { Combo, ComboItem } from '../../ui/combo';
 import { Icon } from '../../ui/icon';
 import { DatePipe, MoneyPipe } from '../../ui/money.pipe';
 import { Ring } from '../../ui/ring';
+import { TargetEditor } from './target-editor';
+import { describeTarget } from '../../core/target-text';
+import { formatMoney } from '../../core/money';
 import { Toasts } from '../../ui/toast';
 
 const EMOJIS = ['🏠', '💡', '📶', '🔁', '🛡️', '🛒', '🍽️', '☕', '🚕', '⛽', '💊', '🧴', '🛍️', '🎉', '🎁', '✈️', '📚', '🧯', '🐑', '🔧', '📱', '👶', '🐾', '💪', '🎮', '🕌', '💳', '🏦', '🚗', '👕', '💼', '🧾'];
 
 @Component({
   selector: 'app-inspector',
-  imports: [Icon, MoneyPipe, DatePipe, Ring, Combo, RouterLink],
+  imports: [Icon, MoneyPipe, DatePipe, Ring, Combo, RouterLink, TargetEditor],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './inspector.html',
   styleUrl: './inspector.scss',
@@ -162,44 +165,8 @@ export class Inspector {
   }
 
   // ------------------------------------------------------------ targets
-  editTarget() {
-    const t = this.cat()?.target;
-    this.tType.set(t?.type ?? 'monthly');
-    this.tAmount.set(t ? (t.amount / 100).toString().replace('.', ',') : '');
-    this.tMode.set(t?.mode ?? 'set');
-    this.tDate.set(t?.date ?? addMonths(this.month(), 6));
-    this.tMonth.set(t?.month ?? 12);
-    this.tWeekday.set(t?.weekday ?? 6);
-    this.editingTarget.set(true);
-  }
-  saveTarget() {
-    const c = this.cat();
-    const amount = parseMoney(this.tAmount());
-    if (!c || !amount || amount <= 0) { this.toasts.show('Enter a target amount', undefined, 2500, 'error'); return; }
-    const t: Target = { type: this.tType(), amount };
-    if (t.type === 'monthly' || t.type === 'weekly') t.mode = this.tMode();
-    if (t.type === 'weekly') t.weekday = this.tWeekday();
-    if (t.type === 'byDate') t.date = this.tDate();
-    if (t.type === 'yearly') t.month = this.tMonth();
-    this.actions.setTarget(c.id, t);
-    this.editingTarget.set(false);
-  }
-  removeTarget() {
-    const c = this.cat();
-    if (!c) return;
-    this.actions.setTarget(c.id, undefined);
-    this.editingTarget.set(false);
-  }
   targetSummary(t: Target): string {
-    const m = new MoneyPipe();
-    const a = m.transform(t.amount);
-    switch (t.type) {
-      case 'monthly': return t.mode === 'refill' ? `Refill up to ${a} each month` : `Set aside ${a} each month`;
-      case 'weekly': return `${a} every ${this.weekdays[t.weekday ?? 6]}`;
-      case 'byDate': return `Save ${a} by ${monthLabel(t.date ?? '')}`;
-      case 'yearly': return `${a} every ${this.monthNames[(t.month ?? 12) - 1]}`;
-      case 'balance': return `Build a balance of ${a}`;
-    }
+    return describeTarget(t, (c) => formatMoney(c, this.store.format()));
   }
   readonly cmTarget = computed(() => this.cm().target);
   ringValue() {
