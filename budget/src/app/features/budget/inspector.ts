@@ -176,4 +176,5 @@ export class Inspector {
     return t.progress;
   }
   readonly cat_ = (c: Category | null) => c;
+  max0(v: number) { return Math.max(0, v); }
 }

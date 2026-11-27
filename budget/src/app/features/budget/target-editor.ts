@@ -21,84 +21,97 @@ type Kind = 'weekly' | 'monthly' | 'yearly' | 'custom' | 'savings';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="te" data-form>
-      <div class="seg block kinds" role="tablist">
-        @for (k of kinds; track k.id) { <button type="button" [class.on]="kind() === k.id" (click)="kind.set(k.id)">{{ k.label }}</button> }
+      <div class="tabs" role="tablist">
+        @for (k of kinds; track k.id) {
+          <button type="button" role="tab" [class.on]="tab() === k.id" [attr.aria-selected]="tab() === k.id" (click)="setTab(k.id)">{{ k.label }}</button>
+        }
       </div>
 
-      <label class="field"><span>{{ kind() === 'savings' ? 'Have a balance of' : 'I need' }}</span>
-        <input class="input amount big" [value]="amount()" (input)="amount.set($any($event.target).value)" inputmode="decimal" placeholder="0,00" /></label>
+      <div class="rows">
+        <label class="r"><span>{{ kind() === 'savings' ? 'Have a balance of' : 'I need' }}</span>
+          <input class="input amount" [value]="amount()" (input)="amount.set($any($event.target).value)" inputmode="decimal" placeholder="0,00" /></label>
 
-      @switch (kind()) {
-        @case ('weekly') {
-          <label class="field"><span>Every</span>
-            <select class="select" [value]="weekday()" (change)="weekday.set(+$any($event.target).value)">@for (d of weekdays; track $index) {<option [value]="$index">{{ d }}</option>}</select></label>
-        }
-        @case ('monthly') {
-          <label class="field"><span>By</span>
-            <select class="select" [value]="day()" (change)="day.set(+$any($event.target).value)">
-              <option [value]="0">Any time in the month</option>@for (d of days; track d) {<option [value]="d">The {{ ordinal(d) }}</option>}</select></label>
-        }
-        @case ('yearly') {
-          <div class="two">
-            <label class="field"><span>Due in</span>
-              <select class="select" [value]="month()" (change)="month.set(+$any($event.target).value)">@for (m of monthNames; track $index) {<option [value]="$index + 1">{{ m }}</option>}</select></label>
-            <label class="field"><span>Day</span>
-              <select class="select" [value]="day()" (change)="day.set(+$any($event.target).value)"><option [value]="0">Any</option>@for (d of days; track d) {<option [value]="d">{{ ordinal(d) }}</option>}</select></label>
-          </div>
-        }
-        @case ('custom') {
-          <label class="field"><span>By</span><input class="input" type="month" [value]="date()" (change)="date.set($any($event.target).value)" /></label>
-          <label class="check"><input type="checkbox" [checked]="repeat()" (change)="repeat.set($any($event.target).checked)" /> Repeat</label>
-          @if (repeat()) {
-            <div class="two">
-              <label class="field"><span>Every</span><input class="input" type="number" min="1" max="60" [value]="every()" (input)="every.set(+$any($event.target).value || 1)" /></label>
-              <label class="field"><span>&nbsp;</span>
-                <div class="seg block"><button type="button" [class.on]="unit() === 'm'" (click)="unit.set('m')">Months</button><button type="button" [class.on]="unit() === 'y'" (click)="unit.set('y')">Years</button></div></label>
-            </div>
+        @switch (kind()) {
+          @case ('weekly') {
+            <label class="r"><span>Every</span>
+              <select class="select" [value]="weekday()" (change)="weekday.set(+$any($event.target).value)">@for (d of weekdays; track $index) {<option [value]="$index">{{ d }}</option>}</select></label>
+          }
+          @case ('monthly') {
+            <label class="r"><span>By</span>
+              <select class="select" [value]="day()" (change)="day.set(+$any($event.target).value)">
+                <option [value]="0">Any day of the month</option>@for (d of days; track d) {<option [value]="d">{{ d >= 31 ? 'Last day of the month' : 'The ' + ordinal(d) }}</option>}</select></label>
+          }
+          @case ('yearly') {
+            <div class="r"><span>By</span>
+              <div class="pair">
+                <select class="select" [value]="month()" (change)="month.set(+$any($event.target).value)" aria-label="Month">@for (m of monthNames; track $index) {<option [value]="$index + 1">{{ m }}</option>}</select>
+                <select class="select" [value]="day()" (change)="day.set(+$any($event.target).value)" aria-label="Day"><option [value]="0">Any day</option>@for (d of days; track d) {<option [value]="d">{{ ordinal(d) }}</option>}</select>
+              </div></div>
+          }
+          @default {
+            @if (kind() === 'custom') {
+              <label class="r"><span>By</span><input class="input" type="month" [value]="date()" (change)="date.set($any($event.target).value)" /></label>
+              <div class="r"><span>Repeat</span>
+                <button type="button" class="switch" role="switch" [attr.aria-checked]="repeat()" [class.on]="repeat()" (click)="repeat.set(!repeat())"><i></i></button></div>
+              @if (repeat()) {
+                <div class="r"><span>Every</span>
+                  <div class="pair">
+                    <input class="input" type="number" min="1" max="60" [value]="every()" (input)="every.set(+$any($event.target).value || 1)" aria-label="Interval" />
+                    <select class="select" [value]="unit()" (change)="unit.set($any($event.target).value)" aria-label="Unit"><option value="m">{{ every() === 1 ? 'Month' : 'Months' }}</option><option value="y">{{ every() === 1 ? 'Year' : 'Years' }}</option></select>
+                  </div></div>
+              }
+            } @else {
+              <div class="r"><span>Due date</span>
+                <button type="button" class="switch" role="switch" [attr.aria-checked]="hasDeadline()" [class.on]="hasDeadline()" (click)="hasDeadline.set(!hasDeadline())"><i></i></button></div>
+              @if (hasDeadline()) { <label class="r"><span>By</span><input class="input" type="month" [value]="date()" (change)="date.set($any($event.target).value)" /></label> }
+            }
+            <label class="r"><span>Goal</span>
+              <select class="select" [value]="kind()" (change)="setCustomKind($any($event.target).value)">
+                <option value="custom">Need it by a date</option><option value="savings">Just build up a balance</option></select></label>
           }
         }
-        @case ('savings') {
-          <label class="check"><input type="checkbox" [checked]="hasDeadline()" (change)="hasDeadline.set($any($event.target).checked)" /> By a specific date</label>
-          @if (hasDeadline()) { <label class="field"><span>By</span><input class="input" type="month" [value]="date()" (change)="date.set($any($event.target).value)" /></label> }
-        }
-      }
 
-      @if (kind() === 'weekly' || kind() === 'monthly') {
-        <div class="field"><span>Next {{ kind() === 'weekly' ? 'week' : 'month' }} I want to</span>
-          <div class="modes">
-            <button type="button" class="mode" [class.on]="mode() === 'set'" (click)="mode.set('set')">
-              <strong>Set aside another {{ (parsed() ?? 0) | money }}</strong><small>Keep adding, even if some is left over. Good for bills and saving.</small></button>
-            <button type="button" class="mode" [class.on]="mode() === 'refill'" (click)="mode.set('refill')">
-              <strong>Refill up to {{ (parsed() ?? 0) | money }}</strong><small>Top up to this amount; leftovers count. Good for spending like groceries.</small></button>
-          </div>
-        </div>
-      }
+        @if (kind() === 'weekly' || kind() === 'monthly') {
+          <label class="r"><span>Next {{ kind() === 'weekly' ? 'week' : 'month' }} I want to</span>
+            <select class="select" [value]="mode()" (change)="mode.set($any($event.target).value)">
+              <option value="set">Set aside another {{ (parsed() ?? 0) | money }}</option>
+              <option value="refill">Refill up to {{ (parsed() ?? 0) | money }}</option>
+            </select></label>
+          <p class="hint">{{ mode() === 'set' ? 'Adds the full amount every ' + (kind() === 'weekly' ? 'week' : 'month') + ', even if some is left over.' : 'Tops the category up to this amount; anything left over counts.' }}</p>
+        }
+      </div>
 
       @if (preview(); as p) {
-        <div class="preview">
-          <strong>{{ p.sentence }}</strong>
-          @if (p.perMonth !== null) { <span>That’s {{ p.perMonth | money }} to assign in {{ monthLabel() }}.</span> }
-        </div>
+        <p class="sentence">{{ p.sentence }}@if (p.perMonth !== null) {<span> · {{ p.perMonth | money }} needed in {{ monthLabel() }}</span>}</p>
       }
 
-      <div class="row">
+      <div class="foot">
         <button class="btn sm primary" type="button" [disabled]="!parsed()" (click)="save()">Save target</button>
         <button class="btn sm ghost" type="button" (click)="done.emit()">Cancel</button>
         <span class="grow"></span>
-        @if (category().target) { <button class="btn sm danger" type="button" (click)="remove()">Remove</button> }
+        @if (category().target) { <button class="del" type="button" (click)="remove()">Delete</button> }
       </div>
     </div>`,
   styles: `
-    .te { display: flex; flex-direction: column; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
-    .kinds { flex-wrap: wrap; border-radius: 12px; button { padding: 0 8px; font-size: 12.5px; flex: 1 1 auto; } }
-    .big { height: 44px; font: 650 18px/1 var(--display); }
-    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .check { display: flex; gap: 8px; align-items: center; font-size: 13.5px; color: var(--ink-2); }
-    .modes { display: flex; flex-direction: column; gap: 6px; }
-    .mode { text-align: left; border: 1px solid var(--line-2); background: var(--surface); border-radius: 10px; padding: 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 2px;
-      strong { font-size: 13.5px; color: var(--ink); } small { font-size: 12px; color: var(--ink-3); font-weight: 450; }
-      &.on { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); } }
-    .preview { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-size: 13px; color: var(--ink-2); strong { color: var(--ink); } }`,
+    .te { container-type: inline-size; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+    .tabs { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); background: var(--surface-2);
+      button { height: 40px; border: 0; background: none; font-weight: 600; font-size: 13px; color: var(--ink-2); cursor: pointer; position: relative;
+        &:hover { color: var(--ink); }
+        &.on { color: var(--accent-ink); background: var(--surface); }
+        &.on::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); } } }
+    .rows { display: flex; flex-direction: column; gap: 10px; padding: 14px 14px 4px; }
+    .r { display: grid; grid-template-columns: 118px minmax(0, 1fr); align-items: center; gap: 10px;
+      > span { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+      .input, .select { height: 36px; } }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .switch { width: 40px; height: 24px; border-radius: 999px; border: 0; background: var(--line-2); position: relative; cursor: pointer; transition: background .2s;
+      i { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .2s var(--ease); }
+      &.on { background: var(--accent); i { transform: translateX(16px); } } }
+    .hint { margin: -2px 0 0 128px; font-size: 12px; color: var(--ink-3); }
+    .sentence { margin: 8px 14px 0; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-size: 13px; font-weight: 600; span { font-weight: 450; color: var(--ink-2); } }
+    .foot { display: flex; align-items: center; gap: 6px; padding: 12px 14px 14px; }
+    .del { border: 0; background: none; color: var(--neg); font-weight: 600; font-size: 13px; cursor: pointer; padding: 4px 6px; border-radius: 6px; &:hover { background: var(--neg-soft); } }
+    @container (max-width: 440px) { .r { grid-template-columns: 1fr; gap: 5px; } .hint { margin-left: 0; } }`,
 })
 export class TargetEditor {
   private store = inject(Store);
@@ -107,10 +120,13 @@ export class TargetEditor {
   readonly forMonth = input.required<string>();
   readonly done = output<void>();
 
-  readonly kinds: { id: Kind; label: string }[] = [
-    { id: 'weekly', label: 'Weekly' }, { id: 'monthly', label: 'Monthly' }, { id: 'yearly', label: 'Yearly' },
-    { id: 'custom', label: 'Custom' }, { id: 'savings', label: 'Savings' },
+  readonly kinds: { id: 'weekly' | 'monthly' | 'yearly' | 'custom'; label: string }[] = [
+    { id: 'weekly', label: 'Weekly' }, { id: 'monthly', label: 'Monthly' }, { id: 'yearly', label: 'Yearly' }, { id: 'custom', label: 'Custom' },
   ];
+  /** "Savings balance" lives inside the Custom tab */
+  readonly tab = computed(() => (this.kind() === 'savings' ? 'custom' : this.kind()));
+  setTab(k: Kind) { if (this.tab() !== k) this.kind.set(k); }
+  setCustomKind(k: Kind) { this.kind.set(k); }
   readonly weekdays = WEEKDAYS;
   readonly days = Array.from({ length: 31 }, (_, i) => i + 1);
   readonly monthNames = Array.from({ length: 12 }, (_, i) => monthName(`2000-${String(i + 1).padStart(2, '0')}`));

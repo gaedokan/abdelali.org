@@ -60,7 +60,7 @@
 .emoji { font-size: 15px; width: 20px; text-align: center; flex: none; }
 .cat-name { font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .status { font-size: 12px; color: var(--ink-3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  &.warn { color: var(--warn); } &.neg { color: var(--neg); } &.credit { color: var(--credit); } &.pos { color: var(--ink-3); } }
+  &.warn { color: var(--warn); } &.neg { color: var(--neg); } &.credit { color: var(--credit); } &.pos { color: var(--pos); } }
 .bar { height: 3px; border-radius: 3px; background: var(--line); margin-top: 6px; overflow: hidden; max-width: 340px;
   i { display: block; height: 100%; background: var(--pos); border-radius: 3px; transition: width .4s var(--ease);
     &.warn { background: var(--warn); } &.neg { background: var(--neg); } &.credit { background: var(--credit); } &.pos, &[class=''] { background: var(--pos); } } }

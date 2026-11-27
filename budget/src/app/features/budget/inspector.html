@@ -46,18 +46,23 @@
         <h3 class="section-title">Target</h3>
         @if (!editingTarget()) {
           @if (c.target) {
-            <div class="t-summary">
-              <app-ring [value]="ringValue()" [size]="44" [tone]="cm().available < 0 ? 'neg' : (cmTarget()?.underfunded ? 'warn' : 'pos')" />
-              <div>
-                <strong>{{ targetSummary(c.target) }}</strong>
-                @if (cmTarget(); as t) {
-                  @if (t.underfunded > 0) { <span class="warn">Assign {{ t.underfunded | money }} more this month</span> }
-                  @else if (t.type === 'balance') { <span class="muted">{{ (t.progress * 100).toFixed(0) }}% there</span> }
-                  @else { <span class="pos">Funded for {{ label() }}</span> }
-                  @if (t.monthsLeft) { <span class="muted">{{ t.need | money }} / month · {{ t.monthsLeft }} month{{ t.monthsLeft === 1 ? '' : 's' }} left</span> }
-                }
-              </div>
+            <div class="t-card">
+              <app-ring [value]="ringValue()" [size]="64" [tone]="cm().available < 0 ? 'neg' : (cmTarget()?.underfunded ? 'warn' : 'pos')" />
+              @if (cmTarget(); as t) {
+                <dl class="t-figs">
+                  @if (t.type === 'balance' && !t.monthsLeft) {
+                    <div><dt>Balance</dt><dd class="num">{{ cm().available | money }}</dd></div>
+                    <div><dt>Goal</dt><dd class="num">{{ t.goal ?? 0 | money }}</dd></div>
+                    <div class="togo"><dt>To go</dt><dd class="num">{{ max0((t.goal ?? 0) - cm().available) | money }}</dd></div>
+                  } @else {
+                    <div><dt>Amount to assign this month</dt><dd class="num">{{ cm().assigned + t.underfunded | money }}</dd></div>
+                    <div><dt>Assigned so far</dt><dd class="num">{{ cm().assigned | money }}</dd></div>
+                    <div class="togo" [class.done]="!t.underfunded"><dt>To go</dt><dd class="num">{{ t.underfunded | money }}</dd></div>
+                  }
+                </dl>
+              }
             </div>
+            <p class="t-sentence">{{ targetSummary(c.target) }}@if (cmTarget()?.monthsLeft; as ml) { · {{ ml }} month{{ ml === 1 ? '' : 's' }} left }</p>
             <div class="row">
               @if (cmTarget()?.underfunded) { <button class="btn sm primary" type="button" (click)="strategy.emit({ s: 'underfunded', id: c.id })">Assign {{ cmTarget()!.underfunded | money:'plain' }}</button> }
               <button class="btn sm" type="button" (click)="editingTarget.set(true)">Edit</button>
