@@ -11,12 +11,11 @@
     "html_handling": "auto-trailing-slash",
     "run_worker_first": ["/budget/api/*"]
   },
-  // Budget sync database. Fill in the name and id of your existing D1 database
-  // (Cloudflare dashboard → Storage & Databases → D1), then uncomment.
-  // The worker creates its own tables (budget_items) on first use and touches nothing else.
-  // "d1_databases": [
-  //   { "binding": "BUDGET_DB", "database_name": "YOUR_DB_NAME", "database_id": "YOUR_DB_ID" }
-  // ],
+  // Budget sync database. The worker creates its own table (budget_items) on first use
+  // and touches nothing else in the database.
+  "d1_databases": [
+    { "binding": "BUDGET_DB", "database_name": "budget-db", "database_id": "83ad0c0e-38b3-4916-9a81-6708c3d45ceb" }
+  ],
   "vars": { "BUDGET_TIMEZONE": "Africa/Casablanca" },
   // Private while in review: no public *.workers.dev address and no preview links.
   // The site only becomes public once a custom domain (abdelali.org) is attached.
