@@ -1,0 +1,103 @@
+<div class="page">
+  <h1>Settings</h1>
+
+  <section class="card">
+    <h2>Budget</h2>
+    <div class="grid">
+      <label class="field"><span>Budget name</span><input class="input" [value]="s().budgetName" (change)="set('budgetName', $any($event.target).value)" /></label>
+      <label class="field"><span>Currency label</span><input class="input" [value]="s().currency" (change)="set('currency', $any($event.target).value)" /></label>
+      <label class="field"><span>Number format</span>
+        <select class="select" [value]="s().decimal + s().group" (change)="set('decimal', $any($event.target).value[0]); set('group', $any($event.target).value[1])">
+          <option value=", ">1 234,56 (Morocco, France)</option><option value=",.">1.234,56</option><option value=".,">1,234.56</option><option value=".'">1'234.56</option>
+        </select></label>
+      <label class="field"><span>Date format</span>
+        <select class="select" [value]="s().dateFormat" (change)="set('dateFormat', $any($event.target).value)">
+          <option value="dd/mm/yyyy">dd/mm/yyyy</option><option value="mm/dd/yyyy">mm/dd/yyyy</option><option value="yyyy-mm-dd">yyyy-mm-dd</option>
+        </select></label>
+      <label class="field"><span>Currency position</span>
+        <div class="seg block"><button type="button" [class.on]="!s().symbolFirst" (click)="set('symbolFirst', false)">45,00 MAD</button><button type="button" [class.on]="s().symbolFirst" (click)="set('symbolFirst', true)">MAD 45,00</button></div></label>
+      <label class="field"><span>Appearance</span>
+        <div class="seg block">
+          <button type="button" [class.on]="ui.theme() === 'system'" (click)="ui.setTheme('system')">Auto</button>
+          <button type="button" [class.on]="ui.theme() === 'light'" (click)="ui.setTheme('light')"><app-icon name="sun" [size]="14" /> Light</button>
+          <button type="button" [class.on]="ui.theme() === 'dark'" (click)="ui.setTheme('dark')"><app-icon name="moon" [size]="14" /> Dark</button>
+        </div></label>
+    </div>
+  </section>
+
+  <section class="card" id="sync">
+    <h2><app-icon name="cloud" /> Sync across devices</h2>
+    <p class="muted">Your budget is saved on this device and works offline. With sync on, changes are copied to your Cloudflare database and to your other devices within seconds.</p>
+    @if (sync.enabled) {
+      <div class="status ok"><app-icon name="check-circle" [size]="18" /><span>Sync is on @if (lastSync()) { · last synced {{ lastSync() }} } @if (sync.error()) { · <b class="err">{{ sync.error() }}</b> }</span></div>
+      <div class="row"><button class="btn" type="button" (click)="sync.syncNow()"><app-icon name="sync" [size]="15" /> Sync now</button><button class="btn ghost" type="button" (click)="disconnect()">Turn off on this device</button></div>
+    } @else {
+      @if (sync.serverConfigured() === false) {
+        <div class="status warn"><app-icon name="alert" [size]="18" /><span>The server isn’t set up yet: it needs the <code>BUDGET_DB</code> D1 binding and a <code>BUDGET_PASSWORD</code> secret (see the README).</span></div>
+      }
+      <div class="row"><input class="input pw" type="password" aria-label="Sync password" [value]="pw()" (input)="pw.set($any($event.target).value)" placeholder="Sync password" (keydown.enter)="connect()" autocomplete="current-password" />
+        <button class="btn primary" type="button" (click)="connect()" [disabled]="busy() || !pw()">{{ busy() ? 'Connecting…' : 'Turn on sync' }}</button></div>
+      @if (syncErr()) { <p class="err">{{ syncErr() }}</p> }
+    }
+  </section>
+
+  <section class="card" id="wallet">
+    <h2><app-icon name="phone" /> Log Apple Wallet payments automatically</h2>
+    <p class="muted">On iPhone (iOS 17 or later), a personal automation can send every Apple Pay payment straight to this budget. It shows up in the account with a <b>Wallet</b> badge, categorised from the payee’s last category, ready for you to approve.</p>
+    <ol class="steps">
+      <li>Open <b>Shortcuts</b> → <b>Automation</b> → <b>+</b> → <b>Transaction</b>. Choose your cards, keep the other options, and pick <b>Run Immediately</b>.</li>
+      <li>Add the action <b>Get Contents of URL</b>:
+        <div class="kv">
+          <span>URL</span><code>{{ endpoint }}</code><button class="btn sm ghost" type="button" (click)="copy(endpoint)" aria-label="Copy URL"><app-icon name="copy" [size]="13" /></button>
+          <span>Method</span><code>POST</code><i></i>
+          <span>Headers</span><code>Authorization: Bearer <em>your sync password or wallet token</em></code><i></i>
+          <span>Request body</span><code>JSON — <b>amount</b> = Shortcut Input › Amount, <b>merchant</b> = Merchant, <b>card</b> = Card or Pass › Name</code><i></i>
+        </div></li>
+      <li>Optional: add <b>Get Dictionary Value</b> “message” from the result, then <b>Show Notification</b>, so you see e.g. “Spent 45,00 MAD at Carrefour → Groceries”.</li>
+      <li>Make sure each account’s <b>iPhone Wallet card names</b> (Edit account) match your card names, so payments land in the right account.</li>
+    </ol>
+    <p class="muted small">Tip: for a token that can only add transactions, set a separate <code>BUDGET_WALLET_TOKEN</code> secret on the server and use it in the shortcut instead of your password.</p>
+    <p class="muted small">For cash, add a home-screen shortcut with an “Open URL” action like <code>{{ addLink }}</code>, which opens Quick add pre-filled.</p>
+  </section>
+
+  <section class="card">
+    <h2><app-icon name="list" /> Payees</h2>
+    <p class="muted">Rename payees, set the category they should get automatically, or merge duplicates (e.g. “CARREFOUR MARKET 123” into “Carrefour”).</p>
+    <input class="input search" type="search" aria-label="Search payees" placeholder="Search payees" [value]="payeeQuery()" (input)="payeeQuery.set($any($event.target).value)" />
+    <div class="payees">
+      @for (x of payees(); track x.p.id) {
+        <div class="payee" data-form>
+          <input class="input" [attr.aria-label]="'Name of payee ' + x.p.name" [value]="x.p.name" (change)="renamePayee(x.p, $any($event.target).value)" />
+          <app-combo [compact]="true" [items]="pickers.categories()" [value]="x.p.categoryId ?? null" (valueChange)="setPayeeCategory(x.p, $event)" placeholder="Auto category" />
+          <app-combo [compact]="true" [items]="payeeItems()" [value]="mergeInto()[x.p.id] ?? null" (valueChange)="setMerge(x.p.id, $event)" placeholder="Merge into…" />
+          <button class="btn sm" type="button" [disabled]="!mergeInto()[x.p.id]" (click)="merge(x.p)">Merge</button>
+          <span class="n" [attr.aria-label]="x.n + ' transactions'">{{ x.n }}</span>
+        </div>
+      } @empty { <p class="muted">No payees yet.</p> }
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><app-icon name="download" /> Backup &amp; data</h2>
+    <div class="row wrap">
+      <button class="btn" type="button" (click)="exportJson()"><app-icon name="download" [size]="15" /> Download backup (JSON)</button>
+      <button class="btn" type="button" (click)="exportCsv()"><app-icon name="download" [size]="15" /> Export transactions (CSV)</button>
+      <label class="btn"><app-icon name="upload" [size]="15" /> Restore backup<input type="file" accept="application/json,.json" hidden (change)="restore($any($event.target).files?.[0])" /></label>
+      <button class="btn" type="button" (click)="ui.importFor.set(null)"><app-icon name="import" [size]="15" /> Import bank / YNAB file</button>
+    </div>
+    <div class="danger">
+      <div><strong>Delete all data</strong><p class="muted small">Removes every account, category and transaction{{ sync.enabled ? ' on all synced devices' : '' }}.</p></div>
+      <button class="btn danger" type="button" (click)="reset()">Delete everything</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><app-icon name="command" /> Keyboard shortcuts</h2>
+    <div class="keys">
+      <span><span class="kbd">N</span> Add transaction</span><span><span class="kbd">⌘ K</span> Search &amp; commands</span>
+      <span><span class="kbd">⌘ Z</span> Undo</span><span><span class="kbd">⇧ ⌘ Z</span> Redo</span>
+      <span><span class="kbd">G</span> <span class="kbd">B</span> Budget</span><span><span class="kbd">G</span> <span class="kbd">T</span> Transactions</span>
+      <span><span class="kbd">G</span> <span class="kbd">R</span> Reports</span><span><span class="kbd">Tab / ↑ ↓</span> Move between assigned amounts</span>
+    </div>
+  </section>
+</div>

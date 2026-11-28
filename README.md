@@ -31,6 +31,11 @@ The date comes from the file name, and the URL from the rest of it: `2026-05-01-
 
 Optional front-matter fields: `date` (overrides the file name), `slug` (overrides the URL), `source` (link to where it was first published — shows "Originally published on …"), and `draft: true` (keeps the file in the repo without publishing it).
 
+## Budget app
+
+A personal budgeting app lives in `budget/` (Angular) and is published at `/budget/`. Its sync API runs in `worker/index.ts`.
+See [budget/README.md](budget/README.md) for features, sync setup (D1 + password) and the iPhone Wallet shortcut.
+
 ## Edit other content
 
 | What | Where |
@@ -54,4 +59,4 @@ npm run build     # generates dist/
 npm run dev       # build + serve locally with Wrangler
 ```
 
-No dependencies — the generator is a single file, `build.mjs`, using only Node.js (18+).
+The blog generator has no dependencies (`build.mjs`, Node.js 18+). The budget app in `budget/` is installed and built automatically by `npm run build`.
