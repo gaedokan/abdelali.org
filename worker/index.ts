@@ -170,10 +170,11 @@ export default {
     const configured = !!(env.BUDGET_DB && env.BUDGET_PASSWORD);
     if (!configured) {
       // fail closed: nothing under /budget is served until a passphrase exists
-      if (path === '/budget/api/status') return json({ configured: false, authenticated: false });
+      const missing = { database: !env.BUDGET_DB, password: !env.BUDGET_PASSWORD };
+      if (path === '/budget/api/status') return json({ configured: false, authenticated: false, missing });
       return path.startsWith('/budget/api/')
         ? json({ error: 'The budget app is not configured yet (BUDGET_DB binding and BUDGET_PASSWORD secret).' }, 503)
-        : html(setupPage(), 503);
+        : html(setupPage(missing), 503);
     }
 
     try {
@@ -326,8 +327,35 @@ ${o.error ? `<div class="err" role="alert">${escHtml(o.error)}</div>` : ''}
 </form>`);
 }
 
-function setupPage() {
-  return shell('Envelope', `<h1>Not set up yet</h1><p>Add the <b>BUDGET_PASSWORD</b> secret to the Worker in Cloudflare (Workers &amp; Pages → abdelali-site → Settings → Variables and Secrets), then reload.</p>`);
+function setupPage(missing: { database: boolean; password: boolean }) {
+  const row = (ok: boolean, title: string, fix: string) => `
+  <li class="${ok ? 'ok' : 'bad'}">
+    <span class="mark" aria-hidden="true">${ok ? '✓' : '✗'}</span>
+    <div><b>${title}</b> — ${ok ? 'found' : 'missing'}${ok ? '' : `<p>${fix}</p>`}</div>
+  </li>`;
+  return shell('Envelope · setup', `
+<h1>Almost ready</h1>
+<p>The budget stays locked until both of these reach the running Worker:</p>
+<ul class="check">
+${row(!missing.password, 'Passphrase secret <code>BUDGET_PASSWORD</code>',
+  'Workers &amp; Pages → abdelali-site → Settings → Variables and Secrets → Add. Choose type <b>Secret</b> (not Text: text variables are wiped by the next GitHub deploy), name it exactly <code>BUDGET_PASSWORD</code>, then <b>Deploy</b>.')}
+${row(!missing.database, 'Database binding <code>BUDGET_DB</code>',
+  'It comes from <code>wrangler.jsonc</code> (D1 database <code>budget-db</code>). Check Settings → Bindings; if it is absent, open Deployments and look at the latest build log.')}
+</ul>
+<p class="small">Reload this page after each change. Changes can take a few seconds to reach the Worker.</p>
+<button type="button" onclick="location.reload()">Reload</button>
+<style>
+.check{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px}
+.check li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;border:1px solid var(--line)}
+.check li.ok{background:var(--soft)}
+.check li.bad{background:var(--negsoft)}
+.check .mark{font-weight:800;font-size:1.1rem;line-height:1.3}
+.check li.ok .mark{color:var(--accent)}
+.check li.bad .mark,.check li.bad b{color:var(--neg)}
+.check p{margin:6px 0 0;font-size:.92rem}
+.small{font-size:.9rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em}
+</style>`);
 }
 
 // ------------------------------------------------------------------ sync
