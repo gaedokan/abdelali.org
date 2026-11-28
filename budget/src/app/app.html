@@ -1,4 +1,4 @@
-@if (store.ready()) {
+@if (store.ready() && sync.settled()) {
   @if (!store.settings().onboarded && !store.accounts().length) {
     <app-onboarding />
   } @else {
@@ -64,7 +64,7 @@
             <a routerLink="/settings" routerLinkActive="on" ariaCurrentWhenActive="page" class="foot-link" (click)="closeNav()"><app-icon name="settings" [size]="16" /> Settings</a>
             <div class="sync" role="status" [attr.data-state]="sync.state()" [title]="sync.error() || ''">
               @switch (sync.state()) {
-                @case ('off') { <app-icon name="cloud-off" [size]="15" /> <span>Local only</span> }
+                @case ('off') { <app-icon name="cloud-off" [size]="15" /> <span>{{ sync.serverConfigured() === null ? 'Not connected' : 'Local only' }}</span> }
                 @case ('syncing') { <app-icon name="sync" [size]="15" class="spin" /> <span>Syncing…</span> }
                 @case ('idle') { <app-icon name="cloud" [size]="15" /> <span>Synced</span> }
                 @case ('offline') { <app-icon name="cloud-off" [size]="15" /> <span>Offline — saved on device</span> }

@@ -4,12 +4,11 @@ import { AccountType } from '../../core/models';
 import { parseMoney } from '../../core/money';
 import { applyTemplate, loadDemo, TEMPLATE } from '../../core/seed';
 import { Store } from '../../core/store';
-import { Sync } from '../../core/sync';
 import { Icon } from '../../ui/icon';
 
 interface DraftAccount { name: string; type: AccountType; balance: string }
 
-/** Two-minute setup: name → accounts → categories → done. Or load the demo, or connect to sync. */
+/** Two-minute setup: name → accounts → categories → done. Or load the demo. (Signed-in devices download the budget automatically.) */
 @Component({
   selector: 'app-onboarding',
   imports: [Icon],
@@ -26,16 +25,8 @@ interface DraftAccount { name: string; type: AccountType; balance: string }
             <p class="lead">Envelope is zero-based budgeting: you plan only the money you actually have, category by category, and adjust as life happens.</p>
             <label class="field"><span>What should we call this budget?</span><input class="input lg" [value]="name()" (input)="name.set($any($event.target).value)" (keydown.enter)="step.set(1)" /></label>
             <div class="row end">
-              <button class="btn ghost" type="button" (click)="showSync.set(!showSync())"><app-icon name="cloud" [size]="15" /> I already use Envelope on another device</button>
               <button class="btn primary lg" type="button" (click)="step.set(1)">Get started</button>
             </div>
-            @if (showSync()) {
-              <div class="sync-box">
-                <p class="muted">Enter the sync password set on your server to download your budget.</p>
-                <div class="row"><input class="input" type="password" [value]="pw()" (input)="pw.set($any($event.target).value)" placeholder="Sync password" (keydown.enter)="connect()" /><button class="btn primary" type="button" (click)="connect()" [disabled]="busy()">Connect</button></div>
-                @if (err()) { <p class="err">{{ err() }}</p> }
-              </div>
-            }
             <button class="link" type="button" (click)="demo()">Or explore a demo budget first →</button>
           }
           @case (1) {
@@ -98,14 +89,9 @@ interface DraftAccount { name: string; type: AccountType; balance: string }
 export class Onboarding {
   private store = inject(Store);
   private actions = inject(Actions);
-  private sync = inject(Sync);
   readonly template = TEMPLATE;
   readonly step = signal(0);
   readonly name = signal('My budget');
-  readonly showSync = signal(false);
-  readonly pw = signal('');
-  readonly err = signal<string | null>(null);
-  readonly busy = signal(false);
   readonly accounts = signal<DraftAccount[]>([
     { name: 'Bank account', type: 'checking', balance: '' },
     { name: 'Cash wallet', type: 'cash', balance: '' },
@@ -140,9 +126,4 @@ export class Onboarding {
     });
   }
   demo() { loadDemo(this.actions, this.store); }
-  async connect() {
-    this.busy.set(true);
-    this.err.set(await this.sync.connect(this.pw()));
-    this.busy.set(false);
-  }
 }

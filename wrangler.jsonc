@@ -2,14 +2,15 @@
 {
   "name": "abdelali-site",
   "compatibility_date": "2026-11-01",
-  // Only /budget/api/* runs this code (sync + iPhone Wallet endpoint). Everything else is static.
+  // Everything under /budget runs this code first (login gate, sync, iPhone Wallet endpoint).
+  // The blog is served straight from dist/.
   "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
-    "run_worker_first": ["/budget/api/*"]
+    "run_worker_first": ["/budget", "/budget/*"]
   },
   // Budget sync database. The worker creates its own table (budget_items) on first use
   // and touches nothing else in the database.
@@ -17,9 +18,8 @@
     { "binding": "BUDGET_DB", "database_name": "budget-db", "database_id": "83ad0c0e-38b3-4916-9a81-6708c3d45ceb" }
   ],
   "vars": { "BUDGET_TIMEZONE": "Africa/Casablanca" },
-  // Reachable only at abdelali-site.<account>.workers.dev, behind Cloudflare Access (login
-  // required: Settings → Domains & Routes → workers.dev → Cloudflare Access). No custom domain,
-  // no preview links.
+  // Reachable only at abdelali-site.<account>.workers.dev (no custom domain, no preview links).
+  // /budget/ is protected by the Worker's own login (BUDGET_PASSWORD secret).
   "workers_dev": true,
   "preview_urls": false
 }

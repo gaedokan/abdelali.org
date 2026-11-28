@@ -26,19 +26,22 @@
   </section>
 
   <section class="card" id="sync">
-    <h2><app-icon name="cloud" /> Sync across devices</h2>
-    <p class="muted">Your budget is saved on this device and works offline. With sync on, changes are copied to your Cloudflare database and to your other devices within seconds.</p>
-    @if (sync.enabled) {
-      <div class="status ok"><app-icon name="check-circle" [size]="18" /><span>Sync is on @if (lastSync()) { · last synced {{ lastSync() }} } @if (sync.error()) { · <b class="err">{{ sync.error() }}</b> }</span></div>
-      <div class="row"><button class="btn" type="button" (click)="sync.syncNow()"><app-icon name="sync" [size]="15" /> Sync now</button><button class="btn ghost" type="button" (click)="disconnect()">Turn off on this device</button></div>
-    } @else {
-      @if (sync.serverConfigured() === false) {
-        <div class="status warn"><app-icon name="alert" [size]="18" /><span>The server isn’t set up yet: it needs the <code>BUDGET_DB</code> D1 binding and a <code>BUDGET_PASSWORD</code> secret (see the README).</span></div>
+    <h2><app-icon name="lock" /> Account &amp; sync</h2>
+    <p class="muted">The app is private: it only opens after signing in with your passphrase. While you’re signed in, every change syncs to your Cloudflare database and to your other devices within seconds, and the app keeps working offline.</p>
+    @switch (sync.state()) {
+      @case ('error') { <div class="status warn" role="status"><app-icon name="alert" [size]="18" /><span>Sync problem: <b>{{ sync.error() }}</b></span></div> }
+      @case ('offline') { <div class="status warn" role="status"><app-icon name="cloud-off" [size]="18" /><span>Offline — changes are saved on this device and will sync when you’re back online.</span></div> }
+      @default {
+        @if (sync.enabled) { <div class="status ok" role="status"><app-icon name="check-circle" [size]="18" /><span>Signed in · sync is on @if (lastSync()) { · last synced {{ lastSync() }} }</span></div> }
+        @else { <div class="status warn" role="status"><app-icon name="cloud-off" [size]="18" /><span>Not connected to the server. Your data is only on this device.</span></div> }
       }
-      <div class="row"><input class="input pw" type="password" aria-label="Sync password" [value]="pw()" (input)="pw.set($any($event.target).value)" placeholder="Sync password" (keydown.enter)="connect()" autocomplete="current-password" />
-        <button class="btn primary" type="button" (click)="connect()" [disabled]="busy() || !pw()">{{ busy() ? 'Connecting…' : 'Turn on sync' }}</button></div>
-      @if (syncErr()) { <p class="err">{{ syncErr() }}</p> }
     }
+    <div class="row wrap">
+      @if (sync.enabled) { <button class="btn" type="button" (click)="sync.syncNow()"><app-icon name="sync" [size]="15" /> Sync now</button> }
+      <button class="btn" type="button" (click)="signOut(false)">Sign out on this device</button>
+      <button class="btn danger" type="button" (click)="signOut(true)">Sign out everywhere</button>
+    </div>
+    <p class="muted small">Signing out removes the copy stored on this device (after syncing it). “Everywhere” also signs out every other phone or computer — use it if a device is lost. To change your passphrase, update the <code>BUDGET_PASSWORD</code> secret in Cloudflare: that signs everyone out too.</p>
   </section>
 
   <section class="card" id="wallet">
@@ -50,7 +53,7 @@
         <div class="kv">
           <span>URL</span><code>{{ endpoint }}</code><button class="btn sm ghost" type="button" (click)="copy(endpoint)" aria-label="Copy URL"><app-icon name="copy" [size]="13" /></button>
           <span>Method</span><code>POST</code><i></i>
-          <span>Headers</span><code>Authorization: Bearer <em>your sync password or wallet token</em></code><i></i>
+          <span>Headers</span><code>Authorization: Bearer <em>your wallet token (or your passphrase)</em></code><i></i>
           <span>Request body</span><code>JSON — <b>amount</b> = Shortcut Input › Amount, <b>merchant</b> = Merchant, <b>card</b> = Card or Pass › Name</code><i></i>
         </div></li>
       <li>Optional: add <b>Get Dictionary Value</b> “message” from the result, then <b>Show Notification</b>, so you see e.g. “Spent 45,00 MAD at Carrefour → Groceries”.</li>

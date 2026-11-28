@@ -48,7 +48,7 @@ See [budget/README.md](budget/README.md) for features, sync setup (D1 + password
 
 ## Going live
 
-While `"preview": true` is set in `content/site.json`, every page tells search engines not to index it. The site has no custom domain: it is only served at `abdelali-site.<account>.workers.dev`, which must stay behind Cloudflare Access (Workers & Pages → abdelali-site → Settings → Domains & Routes → workers.dev → turn on Cloudflare Access, then allow only your email in Zero Trust → Access → Applications).
+While `"preview": true` is set in `content/site.json`, every page tells search engines not to index it. The site has no custom domain: it is only served at `abdelali-site.<account>.workers.dev`. Everything under `/budget/` is behind the Worker's own login (passphrase in the `BUDGET_PASSWORD` secret); the blog pages are not.
 
 To launch: set `"preview": false`, push, and attach the custom domain `abdelali.org` to the `abdelali-site` Worker in Cloudflare (Workers & Pages → abdelali-site → Settings → Domains & Routes).
 

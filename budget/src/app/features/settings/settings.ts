@@ -25,9 +25,6 @@ export class SettingsPage {
   private actions = inject(Actions);
   private toasts = inject(Toasts);
 
-  readonly pw = signal('');
-  readonly busy = signal(false);
-  readonly syncErr = signal<string | null>(null);
   readonly payeeQuery = signal('');
   readonly mergeInto = signal<Record<string, string | null>>({});
   readonly endpoint = typeof location !== 'undefined' ? `${location.origin}/budget/api/wallet` : '/budget/api/wallet';
@@ -48,16 +45,10 @@ export class SettingsPage {
 
   set<K extends keyof Settings>(k: K, v: Settings[K]) { this.actions.updateSettings({ [k]: v } as Partial<Settings>); }
 
-  async connect() {
-    this.busy.set(true);
-    const err = await this.sync.connect(this.pw());
-    this.syncErr.set(err);
-    this.busy.set(false);
-    if (!err) { this.pw.set(''); this.toasts.show('Sync connected'); }
-  }
-  async disconnect() {
-    await this.sync.disconnect();
-    this.toasts.show('Sync turned off on this device. Your data stays here.');
+  async signOut(everywhere: boolean) {
+    if (everywhere && !confirm('Sign out on every device? You’ll need your passphrase again everywhere.')) return;
+    const err = await this.sync.signOut(everywhere);
+    if (err && err !== 'cancelled') this.toasts.show(err, undefined, 4000, 'error');
   }
 
   // ------------------------------------------------------------ backup

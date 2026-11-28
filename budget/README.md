@@ -20,27 +20,37 @@ It is served at **`/budget/`** on abdelali.org and syncs through the site's Clou
 ```sh
 cd budget
 npm install
-npm start          # http://localhost:4300 (data stays in the browser; sync needs the worker)
+npm start          # http://localhost:4300 (no login or sync; use `npm run dev` at the root for the full Worker)
 npm test           # unit tests (vitest)
 ```
 
 From the repo root, `npm run build` builds the blog **and** this app into `dist/`, and `npm run dev` serves both with the Worker (`wrangler dev`).
 
-## Turn on sync (one time)
+## Privacy, sign-in and sync
 
-1. In `wrangler.jsonc`, uncomment `d1_databases` and fill in your existing database's `database_name` and `database_id`
-   (Cloudflare dashboard → Storage & Databases → D1). The worker creates one table, `budget_items`, and touches nothing else.
-2. Set the password: `npx wrangler secret put BUDGET_PASSWORD` (or Workers & Pages → abdelali-site → Settings → Variables and Secrets).
-   Use a long random passphrase: it protects all budget data.
-3. Optional: `npx wrangler secret put BUDGET_WALLET_TOKEN` — a second token that can only *add* transactions, for the iPhone shortcut.
-4. Deploy, open `/budget/` → Settings → *Sync across devices*, enter the password. Do the same on your phone.
+The whole app (page, code and data) sits behind a login served by the Worker (`worker/index.ts`):
+
+- `/budget/login` asks for your passphrase, the `BUDGET_PASSWORD` secret. Until that secret exists, `/budget/` serves nothing but a "not set up" page.
+- A successful sign-in sets a signed, `HttpOnly`, `Secure`, `SameSite=Lax` session cookie valid for 30 days.
+- Every 5 wrong attempts from the same IP lock sign-in for 15 minutes, doubling each time up to 24 hours.
+- Cookie-authenticated writes are refused unless they come from the app's own origin.
+- *Settings → Sign out everywhere* invalidates every session. Changing `BUDGET_PASSWORD` does the same.
+- While signed in, sync runs automatically through the `budget-db` D1 database (binding `BUDGET_DB`). The worker creates its own tables (`budget_items`, `budget_meta`, `budget_login_attempts`).
+
+Secrets (Workers & Pages → abdelali-site → Settings → Variables and Secrets):
+
+| Secret | |
+| --- | --- |
+| `BUDGET_PASSWORD` | **required**: your passphrase. Use a long one (5+ random words). |
+| `BUDGET_SESSION_KEY` | optional: signs session cookies. If unset, a key derived from the passphrase is used. |
+| `BUDGET_WALLET_TOKEN` | optional: a token that can only add transactions, for the iPhone shortcut. |
 
 ## iPhone: log Apple Wallet payments automatically
 
 Shortcuts → Automation → **+** → **Transaction** → pick cards → *Run Immediately* → add **Get Contents of URL**:
 
 - URL `https://abdelali.org/budget/api/wallet`, method **POST**
-- Header `Authorization: Bearer <BUDGET_WALLET_TOKEN or BUDGET_PASSWORD>`
+- Header `Authorization: Bearer <BUDGET_WALLET_TOKEN>` (or your passphrase)
 - JSON body: `amount` = Amount, `merchant` = Merchant, `card` = Card name (optional: `memo`, `date` as YYYY-MM-DD, `inflow: true` for refunds)
 
 The response has a `message` (e.g. “Spent 45,00 MAD at Carrefour → Groceries · CIH Visa”) you can show with **Show Notification**.
