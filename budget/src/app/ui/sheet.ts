@@ -7,12 +7,12 @@ import { Icon } from './icon';
   imports: [Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <dialog #dlg (cancel)="$event.preventDefault(); closed.emit()" (click)="backdrop($event)" [class.wide]="wide()">
+    <dialog #dlg (cancel)="$event.preventDefault(); closed.emit()" (click)="backdrop($event)" [class.wide]="wide()" [attr.aria-labelledby]="title() ? id + '-t' : null" [attr.aria-label]="title() ? null : 'Details'">
       <div class="sheet">
         <div class="grab" aria-hidden="true"></div>
         @if (title()) {
           <header>
-            <h2>{{ title() }}</h2>
+            <h2 [id]="id + '-t'">{{ title() }}</h2>
             <button class="btn ghost icon sm" type="button" (click)="closed.emit()" aria-label="Close"><app-icon name="x" [size]="16" /></button>
           </header>
         }
@@ -28,14 +28,14 @@ import { Icon } from './icon';
     @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } }
     .sheet { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow-2); max-height: calc(100dvh - 48px); display: flex; flex-direction: column; border: 1px solid var(--line); }
     header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 6px; }
-    h2 { font-size: 18px; }
+    h2 { font-size: 1.125rem; }
     .body { padding: 12px 20px 20px; overflow: auto; }
     .grab { display: none; }
     @media (max-width: 640px) {
       dialog, dialog.wide { max-width: 100vw; margin: auto 0 0; width: 100vw; }
       dialog[open] { animation: up .28s var(--ease); }
       @keyframes up { from { transform: translateY(40px); opacity: .4; } }
-      .sheet { border-radius: 20px 20px 0 0; max-height: 92dvh; padding-bottom: var(--safe-bottom); }
+      .sheet { border-radius: 20px 20px 0 0; max-height: calc(100dvh - env(safe-area-inset-top) - 12px); padding-bottom: var(--safe-bottom); }
       .grab { display: block; width: 38px; height: 5px; border-radius: 9px; background: var(--line-2); margin: 8px auto 0; }
     }
   `,
@@ -45,6 +45,7 @@ export class Sheet {
   readonly title = input('');
   readonly wide = input(false);
   readonly closed = output<void>();
+  readonly id = 'sheet-' + Math.random().toString(36).slice(2, 8);
   private dlg = viewChild.required<ElementRef<HTMLDialogElement>>('dlg');
 
   constructor() {

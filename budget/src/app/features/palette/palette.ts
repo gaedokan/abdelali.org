@@ -37,13 +37,13 @@ interface Cmd { id: string; label: string; hint?: string; icon: string; group: s
     .pal { width: min(620px, 100%); background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-2); border: 1px solid var(--line); overflow: hidden; animation: p .18s var(--ease); }
     @keyframes p { from { transform: translateY(-8px) scale(.98); opacity: 0; } }
     .pin { display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 56px; border-bottom: 1px solid var(--line); color: var(--ink-3);
-      input { flex: 1; border: 0; background: none; font-size: 16px; color: var(--ink); &:focus { outline: none; } } }
+      input { flex: 1; border: 0; background: none; font-size: 1rem; color: var(--ink); &:focus { outline: none; } } }
     .list { max-height: 56vh; overflow: auto; padding: 6px; }
-    .grp { font: 650 10.5px/1 var(--font); text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); padding: 10px 10px 4px; }
+    .grp { font: 650 0.6562rem/1 var(--font); text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); padding: 10px 10px 4px; }
     .item { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; padding: 9px 10px; border-radius: 9px; cursor: pointer; text-align: left; color: var(--ink-2);
-      .lbl { flex: 1; color: var(--ink); } .hint { font-size: 12.5px; font-variant-numeric: tabular-nums; }
+      .lbl { flex: 1; color: var(--ink); } .hint { font-size: 0.7812rem; font-variant-numeric: tabular-nums; }
       &.on { background: var(--accent-soft); color: var(--accent-ink); } }
-    .none { padding: 18px; color: var(--ink-3); font-size: 13.5px; }`,
+    .none { padding: 18px; color: var(--ink-3); font-size: 0.8438rem; }`,
 })
 export class Palette {
   readonly ui = inject(UiState);

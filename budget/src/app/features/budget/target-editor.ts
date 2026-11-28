@@ -95,22 +95,22 @@ type Kind = 'weekly' | 'monthly' | 'yearly' | 'custom' | 'savings';
   styles: `
     .te { container-type: inline-size; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
     .tabs { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); background: var(--surface-2);
-      button { height: 40px; border: 0; background: none; font-weight: 600; font-size: 13px; color: var(--ink-2); cursor: pointer; position: relative;
+      button { height: 40px; border: 0; background: none; font-weight: 600; font-size: 0.8125rem; color: var(--ink-2); cursor: pointer; position: relative;
         &:hover { color: var(--ink); }
         &.on { color: var(--accent-ink); background: var(--surface); }
         &.on::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); } } }
     .rows { display: flex; flex-direction: column; gap: 10px; padding: 14px 14px 4px; }
     .r { display: grid; grid-template-columns: 118px minmax(0, 1fr); align-items: center; gap: 10px;
-      > span { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+      > span { font-size: 0.8125rem; font-weight: 600; color: var(--ink-2); }
       .input, .select { height: 36px; } }
     .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     .switch { width: 40px; height: 24px; border-radius: 999px; border: 0; background: var(--line-2); position: relative; cursor: pointer; transition: background .2s;
       i { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .2s var(--ease); }
       &.on { background: var(--accent); i { transform: translateX(16px); } } }
-    .hint { margin: -2px 0 0 128px; font-size: 12px; color: var(--ink-3); }
-    .sentence { margin: 8px 14px 0; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-size: 13px; font-weight: 600; span { font-weight: 450; color: var(--ink-2); } }
+    .hint { margin: -2px 0 0 128px; font-size: 0.75rem; color: var(--ink-3); }
+    .sentence { margin: 8px 14px 0; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-size: 0.8125rem; font-weight: 600; span { font-weight: 450; color: var(--ink-2); } }
     .foot { display: flex; align-items: center; gap: 6px; padding: 12px 14px 14px; }
-    .del { border: 0; background: none; color: var(--neg); font-weight: 600; font-size: 13px; cursor: pointer; padding: 4px 6px; border-radius: 6px; &:hover { background: var(--neg-soft); } }
+    .del { border: 0; background: none; color: var(--neg); font-weight: 600; font-size: 0.8125rem; cursor: pointer; padding: 4px 6px; border-radius: 6px; &:hover { background: var(--neg-soft); } }
     @container (max-width: 440px) { .r { grid-template-columns: 1fr; gap: 5px; } .hint { margin-left: 0; } }`,
 })
 export class TargetEditor {

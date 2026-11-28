@@ -79,21 +79,21 @@ interface DraftAccount { name: string; type: AccountType; balance: string }
     .ob { width: min(640px, 100%); padding: 32px; display: flex; flex-direction: column; gap: 18px; border-radius: 22px; }
     .steps { display: flex; gap: 6px; i { height: 4px; flex: 1; border-radius: 4px; background: var(--line); transition: background .3s; &.on { background: var(--accent); } } }
     .hero-icon { width: 54px; height: 54px; border-radius: 16px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
-    h1 { font-size: 30px; line-height: 1.1; }
-    .lead { margin: -6px 0 0; color: var(--ink-2); font-size: 15.5px; line-height: 1.5; }
-    .input.lg { height: 46px; font-size: 16px; }
+    h1 { font-size: 1.875rem; line-height: 1.1; }
+    .lead { margin: -6px 0 0; color: var(--ink-2); font-size: 0.9688rem; line-height: 1.5; }
+    .input.lg { height: 46px; font-size: 1rem; }
     .end { justify-content: flex-end; flex-wrap: wrap; }
     .link { border: 0; background: none; color: var(--accent-ink); font-weight: 600; cursor: pointer; align-self: center; padding: 6px; }
-    .sync-box { padding: 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); p { margin: 0 0 8px; font-size: 13.5px; } }
+    .sync-box { padding: 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); p { margin: 0 0 8px; font-size: 0.8438rem; } }
     .err { color: var(--neg) !important; margin-top: 8px !important; }
     .accts { display: flex; flex-direction: column; gap: 8px; }
     .acct { display: grid; grid-template-columns: 140px 1fr 130px 30px; gap: 8px; align-items: center; }
     .tmpl { display: flex; flex-direction: column; gap: 14px; max-height: 46dvh; overflow: auto; }
     .gname { display: flex; gap: 8px; align-items: center; font-weight: 650; margin-bottom: 6px; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag { border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-ink); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-size: 13px; font-weight: 550;
+    .tag { border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-ink); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-size: 0.8125rem; font-weight: 550;
       &.off { background: var(--surface); border-color: var(--line); color: var(--ink-3); text-decoration: line-through; } }
-    @media (max-width: 560px) { .ob { padding: 22px 18px; } h1 { font-size: 24px; } .acct { grid-template-columns: 1fr 1fr 30px; .select { grid-column: span 3; } } }`,
+    @media (max-width: 560px) { .ob { padding: 22px 18px; } h1 { font-size: 1.5rem; } .acct { grid-template-columns: 1fr 1fr 30px; .select { grid-column: span 3; } } }`,
 })
 export class Onboarding {
   private store = inject(Store);

@@ -24,13 +24,13 @@ export interface ComboItem {
   template: `
     <input #inp class="input" [class.compact]="compact()" [placeholder]="placeholder()" [value]="open() ? query() : selectedLabel()"
       (focus)="onFocus()" (input)="query.set(inp.value); open.set(true); active.set(0)"
-      (keydown)="key($event)" [attr.aria-expanded]="open()" role="combobox" autocomplete="off" [attr.aria-label]="placeholder()" />
+      (keydown)="key($event)" [attr.aria-expanded]="open()" role="combobox" aria-autocomplete="list" [attr.aria-controls]="id + '-list'" [attr.aria-activedescendant]="open() ? id + '-o' + active() : null" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" [attr.aria-label]="placeholder()" />
     @if (open()) {
-      <div class="pop" role="listbox">
+      <div class="pop" role="listbox" [id]="id + '-list'" [attr.aria-label]="placeholder()">
         @for (it of filtered(); track it.id; let i = $index) {
           @if (it.group && (i === 0 || filtered()[i - 1].group !== it.group)) { <div class="grp">{{ it.group }}</div> }
-          <button type="button" class="opt" [class.active]="i === active()" (mousedown)="$event.preventDefault()" (click)="choose(it)" (mouseenter)="active.set(i)" role="option">
-            @if (it.emoji) { <span class="emo">{{ it.emoji }}</span> }
+          <button type="button" class="opt" [class.active]="i === active()" (mousedown)="$event.preventDefault()" (click)="choose(it)" (mouseenter)="active.set(i)" role="option" [id]="id + '-o' + i" [attr.aria-selected]="it.id === value()">
+            @if (it.emoji) { <span class="emo" aria-hidden="true">{{ it.emoji }}</span> }
             <span class="lbl">{{ it.label }}</span>
             @if (it.hint) { <span class="hint" [class]="it.hintTone || ''">{{ it.hint }}</span> }
           </button>
@@ -45,18 +45,19 @@ export interface ComboItem {
     }`,
   styles: `
     :host { position: relative; display: block; min-width: 0; }
-    .input.compact { height: 32px; padding: 0 8px; border-radius: 6px; }
+    .input.compact { min-height: 32px; padding: 4px 8px; border-radius: 6px; }
+    @media (pointer: coarse) { .opt { min-height: 48px; } .input.compact { min-height: 44px; } .pop { max-height: 50dvh; } }
     .pop { position: absolute; z-index: 50; top: calc(100% + 4px); left: 0; min-width: 100%; width: max(100%, 280px); max-height: 320px; overflow: auto;
       background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: var(--shadow-2); padding: 4px; animation: f .12s ease-out; }
     @keyframes f { from { opacity: 0; transform: translateY(-4px); } }
-    .grp { font: 650 10.5px/1 var(--font); text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); padding: 10px 10px 4px; }
-    .opt { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; padding: 7px 10px; border-radius: 7px; cursor: pointer; text-align: left; font-size: 14px; }
+    .grp { font: 650 0.6562rem/1 var(--font); text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); padding: 10px 10px 4px; }
+    .opt { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; border: 0; background: none; padding: 7px 10px; border-radius: 7px; cursor: pointer; text-align: left; font-size: 0.875rem; }
     .opt.active { background: var(--accent-soft); }
     .lbl { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .hint { font-variant-numeric: tabular-nums; font-size: 12.5px; color: var(--ink-2); font-weight: 550; }
+    .hint { font-variant-numeric: tabular-nums; font-size: 0.7812rem; color: var(--ink-2); font-weight: 550; }
     .hint.pos { color: var(--pos); } .hint.neg { color: var(--neg); } .hint.warn { color: var(--warn); }
     .create .lbl { color: var(--accent-ink); font-weight: 550; }
-    .none { padding: 12px; color: var(--ink-3); font-size: 13px; }
+    .none { padding: 12px; color: var(--ink-3); font-size: 0.8125rem; }
     .emo { width: 18px; text-align: center; }
   `,
 })
@@ -71,6 +72,7 @@ export class Combo {
   readonly created = output<string>();
   readonly picked = output<ComboItem>();
 
+  readonly id = 'cb-' + Math.random().toString(36).slice(2, 8);
   readonly open = signal(false);
   readonly query = signal('');
   readonly active = signal(0);

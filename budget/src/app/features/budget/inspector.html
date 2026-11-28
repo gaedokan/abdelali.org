@@ -1,18 +1,18 @@
 @if (cat(); as c) {
   <div class="insp">
     <header class="ihead">
-      <button class="emoji-btn" type="button" (click)="showEmoji.set(!showEmoji())" title="Choose an icon">{{ c.emoji || '＋' }}</button>
+      <button class="emoji-btn" type="button" (click)="showEmoji.set(!showEmoji())" title="Choose an icon" aria-label="Choose an icon" [attr.aria-expanded]="showEmoji()">{{ c.emoji || '＋' }}</button>
       <input class="title-input" [value]="c.name" (change)="rename($any($event.target).value)" (keydown.enter)="$any($event.target).blur()" aria-label="Category name" />
       <button class="btn ghost icon sm" type="button" (click)="closed.emit()" aria-label="Close"><app-icon name="x" [size]="16" /></button>
     </header>
     @if (showEmoji()) {
       <div class="emoji-grid">
-        @for (e of emojis; track e) { <button type="button" (click)="setEmoji(e)">{{ e }}</button> }
+        @for (e of emojis; track e) { <button type="button" (click)="setEmoji(e)" [attr.aria-label]="'Icon ' + e">{{ e }}</button> }
         <button type="button" class="none" (click)="setEmoji(undefined)">None</button>
       </div>
     }
 
-    <section class="avail" [class.neg]="cm().available < 0" [class.pos]="cm().available > 0">
+    <section class="avail" aria-live="polite" [class.neg]="cm().available < 0" [class.pos]="cm().available > 0">
       <span class="lbl">Available</span>
       <strong class="num">{{ cm().available | money }}</strong>
       <div class="avail-actions">

@@ -31,13 +31,13 @@ import { UiState } from '../../ui/ui-state';
             @for (ex of examples; track ex) { <button type="button" class="chip" (click)="text.set(ex); focus()">{{ ex }}</button> }
           </div>
 
-          <div class="preview" [class.ready]="ready()">
+          <div class="preview" [class.ready]="ready()" aria-live="polite">
             <div class="amt num" [class.in]="(r().amount ?? 0) > 0">{{ r().amount !== null ? (r().amount | money:'sign') : '—' }}</div>
             <dl>
               <div><dt>Payee</dt><dd>{{ r().payee || '—' }}</dd></div>
               <div><dt>Category</dt><dd [class.warn]="!r().categoryId && needsCat()">{{ catLabel() }}@if (r().categoryGuessed) { <small>remembered</small> }</dd></div>
               <div><dt>Account</dt><dd>
-                <select class="select sm" [value]="accountId()" (change)="accountOverride.set($any($event.target).value)">
+                <select class="select sm" aria-label="Account" [value]="accountId()" (change)="accountOverride.set($any($event.target).value)">
                   @for (a of accounts(); track a.id) { <option [value]="a.id">{{ a.name }}</option> }
                 </select></dd></div>
               <div><dt>Date</dt><dd>{{ r().date | date }}</dd></div>
@@ -53,17 +53,16 @@ import { UiState } from '../../ui/ui-state';
     </app-sheet>`,
   styles: `
     .qbox { display: flex; align-items: center; gap: 10px; padding: 0 14px; height: 54px; border-radius: 14px; border: 1.5px solid var(--accent); background: var(--surface); box-shadow: 0 0 0 4px var(--accent-soft); color: var(--accent); }
-    .qinput { flex: 1; border: 0; background: none; font: 550 18px/1 var(--font); color: var(--ink); min-width: 0; &:focus { outline: none; } &::placeholder { color: var(--ink-3); font-weight: 450; } }
+    .qinput { flex: 1; border: 0; background: none; font: 550 1.125rem/1 var(--font); color: var(--ink); min-width: 0; &:focus { outline: none; } &::placeholder { color: var(--ink-3); font-weight: 450; } }
     .examples { display: flex; gap: 6px; overflow-x: auto; padding: 10px 0 2px; .chip { flex: none; } }
-    .preview { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; padding: 14px 16px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); opacity: .7; transition: opacity .2s;
-      &.ready { opacity: 1; } }
-    .amt { font: 700 26px/1 var(--display); color: var(--neg); min-width: 110px; &.in { color: var(--pos); } }
+    .preview { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; padding: 14px 16px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); }
+    .amt { font: 700 1.625rem/1 var(--display); color: var(--neg); min-width: 110px; &.in { color: var(--pos); } }
     dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;
-      div { min-width: 0; } dt { font-size: 11px; color: var(--ink-3); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+      div { min-width: 0; } dt { font-size: 0.6875rem; color: var(--ink-3); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
       dd { margin: 2px 0 0; font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; small { color: var(--ink-3); font-weight: 500; margin-left: 4px; } }
       dd.warn { color: var(--warn); } }
-    .select.sm { height: 28px; font-size: 13px; padding-left: 8px; }
-    .tips { font-size: 12px; color: var(--ink-3); margin: 12px 0; }
+    .select.sm { height: 28px; font-size: 0.8125rem; padding-left: 8px; }
+    .tips { font-size: 0.75rem; color: var(--ink-3); margin: 12px 0; }
     .end { justify-content: flex-end; } .lg { min-width: 120px; }
     @media (max-width: 520px) { .preview { grid-template-columns: 1fr; gap: 10px; } }`,
 })

@@ -30,7 +30,7 @@ import { formatMoney } from '../../core/money';
         </form>
       }
     </app-sheet>`,
-  styles: `.big { height: 46px; font: 650 20px/1 var(--display); } .end { justify-content: flex-end; } .small { font-size: 12.5px; margin: 0; }`,
+  styles: `.big { height: 46px; font: 650 1.25rem/1 var(--display); } .end { justify-content: flex-end; } .small { font-size: 0.7812rem; margin: 0; }`,
 })
 export class MoveMoney {
   private store = inject(Store);

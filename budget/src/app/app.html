@@ -3,7 +3,7 @@
     <app-onboarding />
   } @else {
     <div class="shell" [class.nav-open]="ui.sidebarOpen()">
-      <aside class="sidebar" (click)="$event.target === $event.currentTarget && closeNav()">
+      <aside class="sidebar" aria-label="Menu" (click)="$event.target === $event.currentTarget && closeNav()">
         <div class="side-inner">
           <div class="brand">
             <span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32" width="30" height="30"><rect x="3" y="7" width="26" height="19" rx="5" fill="currentColor" opacity=".18"/><path d="M3 12l13 8 13-8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="7" width="26" height="19" rx="5" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></span>
@@ -17,24 +17,24 @@
             <app-icon name="search" [size]="15" /><span>Search or jump to…</span><span class="kbd">{{ isMac ? '⌘' : 'Ctrl' }} K</span>
           </button>
 
-          <nav class="main-nav">
-            <a routerLink="/budget" routerLinkActive="on" (click)="closeNav()"><app-icon name="grid" /><span>Budget</span>
+          <nav class="main-nav" aria-label="Main">
+            <a routerLink="/budget" routerLinkActive="on" ariaCurrentWhenActive="page" (click)="closeNav()"><app-icon name="grid" /><span>Budget</span>
               @if (rta() !== 0) { <span class="nav-pill" [class.neg]="rta() < 0">{{ rta() | money:'short' }}</span> }
             </a>
-            <a routerLink="/reports" routerLinkActive="on" (click)="closeNav()"><app-icon name="chart" /><span>Reports</span></a>
-            <a routerLink="/portfolio" routerLinkActive="on" (click)="closeNav()"><app-icon name="trend" /><span>Investments</span></a>
-            <a routerLink="/accounts" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: true }" (click)="closeNav()"><app-icon name="bank" /><span>All accounts</span>
+            <a routerLink="/reports" routerLinkActive="on" ariaCurrentWhenActive="page" (click)="closeNav()"><app-icon name="chart" /><span>Reports</span></a>
+            <a routerLink="/portfolio" routerLinkActive="on" ariaCurrentWhenActive="page" (click)="closeNav()"><app-icon name="trend" /><span>Investments</span></a>
+            <a routerLink="/accounts" routerLinkActive="on" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" (click)="closeNav()"><app-icon name="bank" /><span>All accounts</span>
               @if (totalReview()) { <span class="badge">{{ totalReview() }}</span> }
             </a>
           </nav>
 
-          <div class="accts">
+          <nav class="accts" aria-label="Accounts">
             @if (budgetAccounts().length) {
               <div class="acct-head"><span>Budget</span><span class="num">{{ sum(budgetAccounts()) | money:'plain' }}</span></div>
               @for (a of budgetAccounts(); track a.id) {
-                <a class="acct" [routerLink]="['/accounts', a.id]" routerLinkActive="on" (click)="closeNav()">
+                <a class="acct" [routerLink]="['/accounts', a.id]" routerLinkActive="on" ariaCurrentWhenActive="page" (click)="closeNav()">
                   <span class="acct-name">{{ a.name }}</span>
-                  @if (needsReview().get(a.id); as n) { <span class="dot" [title]="n + ' to review'"></span> }
+                  @if (needsReview().get(a.id); as n) { <span class="dot" [title]="n + ' to review'"></span><span class="sr-only">, {{ n }} to review</span> }
                   <span class="num" [class.neg]="(balances().get(a.id)?.working ?? 0) < 0">{{ balances().get(a.id)?.working ?? 0 | money:'plain' }}</span>
                 </a>
               }
@@ -42,7 +42,7 @@
             @if (trackingAccounts().length) {
               <div class="acct-head"><span>Tracking</span><span class="num">{{ sum(trackingAccounts()) | money:'plain' }}</span></div>
               @for (a of trackingAccounts(); track a.id) {
-                <a class="acct" [routerLink]="['/accounts', a.id]" routerLinkActive="on" (click)="closeNav()">
+                <a class="acct" [routerLink]="['/accounts', a.id]" routerLinkActive="on" ariaCurrentWhenActive="page" (click)="closeNav()">
                   <span class="acct-name">{{ a.name }}</span>
                   <span class="num" [class.neg]="(balances().get(a.id)?.working ?? 0) < 0">{{ balances().get(a.id)?.working ?? 0 | money:'plain' }}</span>
                 </a>
@@ -52,17 +52,17 @@
               <details class="closed">
                 <summary class="acct-head"><span>Closed</span></summary>
                 @for (a of closedAccounts(); track a.id) {
-                  <a class="acct" [routerLink]="['/accounts', a.id]" routerLinkActive="on" (click)="closeNav()"><span class="acct-name">{{ a.name }}</span></a>
+                  <a class="acct" [routerLink]="['/accounts', a.id]" routerLinkActive="on" ariaCurrentWhenActive="page" (click)="closeNav()"><span class="acct-name">{{ a.name }}</span></a>
                 }
               </details>
             }
             <button class="add-acct" type="button" (click)="ui.addAccount.set(true); closeNav()"><app-icon name="plus" [size]="16" /> Add account</button>
-          </div>
+          </nav>
 
           <div class="side-foot">
-            <a routerLink="/scheduled" routerLinkActive="on" class="foot-link" (click)="closeNav()"><app-icon name="repeat" [size]="16" /> Scheduled</a>
-            <a routerLink="/settings" routerLinkActive="on" class="foot-link" (click)="closeNav()"><app-icon name="settings" [size]="16" /> Settings</a>
-            <div class="sync" [attr.data-state]="sync.state()" [title]="sync.error() || ''">
+            <a routerLink="/scheduled" routerLinkActive="on" ariaCurrentWhenActive="page" class="foot-link" (click)="closeNav()"><app-icon name="repeat" [size]="16" /> Scheduled</a>
+            <a routerLink="/settings" routerLinkActive="on" ariaCurrentWhenActive="page" class="foot-link" (click)="closeNav()"><app-icon name="settings" [size]="16" /> Settings</a>
+            <div class="sync" role="status" [attr.data-state]="sync.state()" [title]="sync.error() || ''">
               @switch (sync.state()) {
                 @case ('off') { <app-icon name="cloud-off" [size]="15" /> <span>Local only</span> }
                 @case ('syncing') { <app-icon name="sync" [size]="15" class="spin" /> <span>Syncing…</span> }
@@ -78,18 +78,18 @@
         </div>
       </aside>
 
-      <main class="content">
+      <main class="content" id="main">
         <router-outlet />
       </main>
 
       <!-- phone tab bar -->
-      <nav class="tabbar">
-        <a routerLink="/budget" routerLinkActive="on"><app-icon name="grid" [size]="21" /><span>Budget</span></a>
-        <a routerLink="/accounts" routerLinkActive="on"><app-icon name="bank" [size]="21" /><span>Accounts</span>
+      <nav class="tabbar" aria-label="Tabs">
+        <a routerLink="/budget" routerLinkActive="on" ariaCurrentWhenActive="page"><app-icon name="grid" [size]="21" /><span>Budget</span></a>
+        <a routerLink="/accounts" routerLinkActive="on" ariaCurrentWhenActive="page"><app-icon name="bank" [size]="21" /><span>Accounts</span>
           @if (totalReview()) { <i class="tab-dot"></i> }</a>
         <button class="fab" type="button" (click)="ui.quickAdd.set(true)" aria-label="Add transaction"><app-icon name="plus" [size]="26" [stroke]="2.4" /></button>
-        <a routerLink="/reports" routerLinkActive="on"><app-icon name="chart" [size]="21" /><span>Reports</span></a>
-        <button type="button" (click)="ui.sidebarOpen.set(true)"><app-icon name="menu" [size]="21" /><span>More</span></button>
+        <a routerLink="/reports" routerLinkActive="on" ariaCurrentWhenActive="page"><app-icon name="chart" [size]="21" /><span>Reports</span></a>
+        <button type="button" (click)="ui.sidebarOpen.set(true)" [attr.aria-expanded]="ui.sidebarOpen()"><app-icon name="menu" [size]="21" /><span>More</span></button>
       </nav>
 
       <button class="desk-fab" type="button" (click)="ui.quickAdd.set(true)" title="Add transaction (N)"><app-icon name="plus" [size]="20" [stroke]="2.4" /> <span>Add transaction</span></button>

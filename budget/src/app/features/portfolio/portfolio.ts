@@ -51,7 +51,7 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
       @if (!invAccounts().length) {
         <div class="card empty">
           <app-icon name="trend" [size]="32" />
-          <h3>Track your Casablanca Stock Exchange portfolio</h3>
+          <h2>Track your Casablanca Stock Exchange portfolio</h2>
           <p>Create a brokerage account to record trades, dividends and prices. It is a tracking account: it counts towards net worth but stays outside your budget.</p>
           <form class="inline" (submit)="$event.preventDefault(); createAccount()">
             <input class="input" aria-label="Account name" placeholder="Brokerage account name" [value]="newName()" (input)="newName.set($any($event.target).value)" />
@@ -96,7 +96,7 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
         @if (!rows().length) {
           <div class="card empty">
             <app-icon name="chart" [size]="32" />
-            <h3>No holdings yet</h3>
+            <h2>No holdings yet</h2>
             <p>Record your first buy to see positions, profit and allocation. Funding: record a transfer from your bank to this account in the register first.</p>
             <button type="button" class="btn primary" (click)="openTrade()"><app-icon name="plus" [size]="14" /> Add trade</button>
           </div>
@@ -214,7 +214,7 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
           <div><span class="muted">Realised</span><b class="num" [class.amt-pos]="d.realised > 0" [class.amt-neg]="d.realised < 0">{{ d.realised | money:'sign' }}</b></div>
           <div><span class="muted">Dividends</span><b class="num">{{ d.dividends | money }}</b></div>
         </div>
-        <h3 class="section-title">Price history</h3>
+        <h2 class="section-title">Price history</h2>
         @if (priceChart().pts.length < 2) {
           <p class="muted pad">No price history yet. Each time you update prices a point is added.</p>
         } @else {
@@ -235,7 +235,7 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
         }
         @if (tip(); as t) { @if (t.sheet) { <ng-container *ngTemplateOutlet="tipTpl; context: { $implicit: t }" /> } }
         <div class="card-head">
-          <h3 class="section-title">Trades</h3>
+          <h2 class="section-title">Trades</h2>
           <button type="button" class="btn sm" (click)="openTrade({ symbol: d.symbol })"><app-icon name="plus" [size]="14" /> Add trade</button>
         </div>
         <ul class="trades">
@@ -356,9 +356,9 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
     }
     .page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 56px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
     .head { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; }
-    .head h1 { font-size: 26px; }
+    .head h1 { font-size: 1.625rem; }
     .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .acct { width: auto; min-width: 180px; height: 28px; font-size: 13px; }
+    .acct { width: auto; min-width: 180px; height: 28px; font-size: 0.8125rem; }
     .card { animation: rise .35s var(--ease) both; min-width: 0; }
     @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
     .card-pad { padding: 22px; }
@@ -368,33 +368,33 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
     .inline .input { flex: 1; min-width: 180px; }
 
     .summary { display: grid; grid-template-columns: minmax(240px, 1fr) 2fr; gap: 24px; align-items: center; }
-    .big { font: 700 34px/1.1 var(--display); letter-spacing: -.02em; margin: 2px 0 6px; }
-    .sub { font-size: 12.5px; }
+    .big { font: 700 2.125rem/1.1 var(--display); letter-spacing: -.02em; margin: 2px 0 6px; }
+    .sub { font-size: 0.7812rem; }
     .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
     .stat { min-width: 0; padding-left: 14px; border-left: 1px solid var(--line); }
-    .stat .v { font: 650 18px/1.2 var(--display); margin-bottom: 3px; }
-    .stat .sub { white-space: normal; overflow-wrap: anywhere; font-size: 12px; line-height: 1.35; }
+    .stat .v { font: 650 1.125rem/1.2 var(--display); margin-bottom: 3px; }
+    .stat .sub { white-space: normal; overflow-wrap: anywhere; font-size: 0.75rem; line-height: 1.35; }
     .stat .section-title { margin-bottom: 6px; }
 
     .holdings { overflow: hidden; }
     .thead, .hrow { display: grid; grid-template-columns: minmax(150px, 1.7fr) 70px 96px minmax(110px, 1fr) 118px 118px 110px; column-gap: 12px; align-items: center; padding: 0 16px; }
-    .thead { height: 38px; font: 650 11px/1 var(--font); text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); background: var(--surface-2); border-bottom: 1px solid var(--line); }
+    .thead { height: 38px; font: 650 0.6875rem/1 var(--font); text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); background: var(--surface-2); border-bottom: 1px solid var(--line); }
     .r { text-align: right; }
-    .hrow { min-height: 58px; border-top: 1px solid var(--line); cursor: pointer; transition: background .12s; font-size: 14px; }
+    .hrow { min-height: 58px; border-top: 1px solid var(--line); cursor: pointer; transition: background .12s; font-size: 0.875rem; }
     .hrow:first-of-type { border-top: 0; }
     .hrow:hover, .hrow:focus-visible { background: var(--surface-2); outline: none; }
     .c-name { display: flex; flex-direction: column; min-width: 0; padding: 8px 0; }
-    .sym { font-size: 14.5px; letter-spacing: .01em; }
-    .cname { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sym { font-size: 0.9062rem; letter-spacing: .01em; }
+    .cname { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .lbl { display: none; }
-    .c-last small, .c-pl small { display: block; font-size: 11.5px; line-height: 1.2; }
+    .c-last small, .c-pl small { display: block; font-size: 0.7188rem; line-height: 1.2; }
     .c-pl small { color: inherit; opacity: .85; }
     .c-val { font-weight: 600; }
-    .stale { display: inline-flex; align-items: center; height: 17px; padding: 0 6px; margin-left: 4px; border-radius: 999px; font-size: 10.5px; font-weight: 650; background: var(--warn-soft); color: var(--warn); }
+    .stale { display: inline-flex; align-items: center; height: 17px; padding: 0 6px; margin-left: 4px; border-radius: 999px; font-size: 0.6562rem; font-weight: 650; background: var(--warn-soft); color: var(--warn); }
     .c-w { display: flex; align-items: center; gap: 8px; }
     .bar { flex: 1; height: 6px; border-radius: 6px; background: var(--sunken); overflow: hidden; }
     .bar i { display: block; height: 100%; border-radius: 6px; transition: width .4s var(--ease); }
-    .wp { width: 36px; text-align: right; font-size: 12.5px; color: var(--ink-2); }
+    .wp { width: 36px; text-align: right; font-size: 0.7812rem; color: var(--ink-2); }
 
     .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 18px; align-items: start; }
     .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -402,10 +402,10 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
     .donut .track { fill: none; stroke: var(--sunken); stroke-width: 24; }
     .slice { fill: none; stroke-width: 24; transition: opacity .15s; cursor: default; }
     .slice.dim, .lg-row.dim { opacity: .35; }
-    .d-total { font: 700 20px var(--display); fill: var(--ink); }
-    .d-sub { font-size: 11px; fill: var(--ink-3); }
+    .d-total { font: 700 1.25rem var(--display); fill: var(--ink); }
+    .d-sub { font-size: 0.6875rem; fill: var(--ink-3); }
     .legend { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 2px; }
-    .lg-row { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 8px; font-size: 13.5px; transition: opacity .15s; }
+    .lg-row { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 8px; font-size: 0.8438rem; transition: opacity .15s; }
     .lg-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; display: inline-block; }
     @media (min-width: 640px) { .donut-wrap { flex-direction: row; align-items: center; } .legend { flex: 1; min-width: 0; } }
@@ -413,18 +413,18 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
     .chips { display: flex; gap: 6px; }
     .chart { width: 100%; height: auto; display: block; margin-top: 6px; touch-action: pan-y; }
     .chart .grid { stroke: var(--line); stroke-width: 1; }
-    .chart .ax { fill: var(--ink-3); font-size: 11px; font-variant-numeric: tabular-nums; }
+    .chart .ax { fill: var(--ink-3); font-size: 0.6875rem; font-variant-numeric: tabular-nums; }
     .chart .line { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
     .chart .cost { fill: none; stroke: var(--ink-3); stroke-width: 1.4; stroke-dasharray: 4 4; }
     .chart .area { fill: var(--accent-soft); opacity: .55; stroke: none; }
     .chart .guide { stroke: var(--line-2); stroke-width: 1; }
     .chart .dotp { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
     .chart .hit { fill: transparent; }
-    .key { display: flex; gap: 14px; font-size: 12px; color: var(--ink-2); margin: 4px 0 0; }
+    .key { display: flex; gap: 14px; font-size: 0.75rem; color: var(--ink-2); margin: 4px 0 0; }
     .key .sw { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--accent); margin-right: 6px; vertical-align: middle; }
     .key .sw.dash { background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 8px); }
 
-    .tip { position: fixed; z-index: 1000; pointer-events: none; background: var(--ink); color: var(--bg); padding: 8px 11px; border-radius: 9px; font-size: 12.5px; box-shadow: var(--shadow-2); min-width: 120px; }
+    .tip { position: fixed; z-index: 1000; pointer-events: none; background: var(--ink); color: var(--bg); padding: 8px 11px; border-radius: 9px; font-size: 0.7812rem; box-shadow: var(--shadow-2); min-width: 120px; }
     .tip-title { font-weight: 650; margin-bottom: 3px; }
     .tip-row { display: flex; align-items: center; gap: 7px; }
     .tip-row span { flex: 1; opacity: .8; }
@@ -432,24 +432,24 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
 
     /* detail sheet */
     .d-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px 14px; margin-bottom: 14px; }
-    .d-stats div { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
-    .d-stats b { font-size: 15px; }
+    .d-stats div { display: flex; flex-direction: column; gap: 2px; font-size: 0.75rem; }
+    .d-stats b { font-size: 0.9375rem; }
     .trades { list-style: none; margin: 0; padding: 0; }
-    .trades li { display: grid; grid-template-columns: 84px 74px minmax(0, 1fr) auto 68px; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+    .trades li { display: grid; grid-template-columns: 84px 74px minmax(0, 1fr) auto 68px; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); font-size: 0.8438rem; }
     .tq { text-align: right; }
-    .tf { text-align: right; font-size: 12px; min-width: 60px; }
+    .tf { text-align: right; font-size: 0.75rem; min-width: 60px; }
     .tb { display: flex; justify-content: flex-end; }
-    .side { text-transform: capitalize; font-weight: 600; font-size: 12.5px; }
+    .side { text-transform: capitalize; font-weight: 600; font-size: 0.7812rem; }
     .side.buy { color: var(--pos); } .side.sell { color: var(--neg); } .side.dividend { color: var(--accent-ink); }
 
     /* forms */
     .form { display: flex; flex-direction: column; gap: 14px; }
     .row2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-    .hint { font-size: 12px; color: var(--ink-3); font-weight: 450; margin: 0; }
+    .hint { font-size: 0.75rem; color: var(--ink-3); font-weight: 450; margin: 0; }
     .input.bad { border-color: var(--neg); }
-    .preview { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 10px; background: var(--sunken); font-size: 14px; }
-    .preview b { font-size: 17px; }
-    .error { margin: 0; padding: 8px 12px; border-radius: 8px; background: var(--neg-soft); color: var(--neg); font-size: 13px; font-weight: 550; }
+    .preview { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 10px; background: var(--sunken); font-size: 0.875rem; }
+    .preview b { font-size: 1.0625rem; }
+    .error { margin: 0; padding: 8px 12px; border-radius: 8px; background: var(--neg-soft); color: var(--neg); font-size: 0.8125rem; font-weight: 550; }
     .sf { display: flex; align-items: center; gap: 8px; padding: 12px 20px 16px; border-top: 1px solid var(--line); }
     .sf .grow { flex: 1; }
     .btn.danger { color: var(--neg); }
@@ -457,7 +457,7 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
     .prows { display: grid; gap: 8px; }
     .prow { display: grid; grid-template-columns: minmax(0, 1fr) 110px 110px; gap: 8px; align-items: center; }
     .pn { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
-    .pn span { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pn span { font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     @media (max-width: 860px) {
       .summary { grid-template-columns: minmax(0, 1fr); gap: 16px; }
@@ -468,7 +468,7 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
     @media (max-width: 719px) {
       .page { padding: 16px 16px 40px; }
       .card-pad { padding: 16px; }
-      .big { font-size: 29px; }
+      .big { font-size: 1.8125rem; }
       .actions { width: 100%; } .acct { width: 100%; }
       .thead { display: none; }
       .holdings { background: transparent; border: 0; box-shadow: none; display: grid; gap: 10px; overflow: visible; }
@@ -476,7 +476,7 @@ const CHART_RANGES = [{ key: '1m', label: '1M', days: 31 }, { key: '6m', label: 
         background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-1); }
       .hrow:first-of-type { border-top: 1px solid var(--line); }
       .c-name { grid-area: name; padding: 0; }
-      .c-val { grid-area: val; font-size: 15px; }
+      .c-val { grid-area: val; font-size: 0.9375rem; }
       .c-pl { grid-area: pl; }
       .c-pl small { display: inline; margin-left: 6px; }
       .c-sh, .c-avg, .c-last { display: none; }

@@ -252,6 +252,18 @@ export class Register {
 
   payeeOf(id: string | null | undefined) { return this.store.payeeMap().get(id ?? '')?.name ?? ''; }
   accountName(id: string | null | undefined) { return this.store.accountMap().get(id ?? '')?.name ?? ''; }
+  openLine(l: Line) {
+    if (this.wide()) this.editing.set(l.t.id); else this.ui.txnEditor.set({ id: l.t.id });
+  }
+  private money = new MoneyPipe();
+  private datePipe = new DatePipe();
+  lineLabel(l: Line): string {
+    const amt = l.t.amount < 0 ? `spent ${this.money.transform(-l.t.amount)}` : `received ${this.money.transform(l.t.amount)}`;
+    const parts = [l.payee || 'No payee', amt, l.category || (l.transfer ? '' : 'needs a category'), this.datePipe.transform(l.t.date)];
+    if (!l.t.approved) parts.push('new, needs approval');
+    if (l.t.cleared !== 'uncleared') parts.push(l.t.cleared);
+    return parts.filter(Boolean).join(', ') + '. Edit';
+  }
   clearSel() { this.selected.set(new Set()); }
   goBudget() { this.router.navigate(['/budget']); }
 }

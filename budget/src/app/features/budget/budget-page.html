@@ -3,14 +3,14 @@
     <!-- header -->
     <header class="top">
       <div class="month-nav">
-        <button class="btn ghost icon" type="button" (click)="go(-1)" aria-label="Previous month"><app-icon name="chevron-left" /></button>
+        <button class="btn ghost icon" type="button" (click)="go(-1)" [attr.aria-label]="'Previous month, ' + prevMonthName()"><app-icon name="chevron-left" /></button>
         <h1>{{ label() }}</h1>
         <button class="btn ghost icon" type="button" (click)="go(1)" aria-label="Next month"><app-icon name="chevron-right" /></button>
         @if (!isCurrent()) { <button class="chip" type="button" (click)="go(0)">Today</button> }
       </div>
 
       <div class="rta" [class.pos]="rta() > 0" [class.neg]="rta() < 0" [class.zero]="rta() === 0">
-        <div class="rta-text">
+        <div class="rta-text" aria-live="polite" aria-atomic="true">
           <span class="rta-amount num">{{ rta() | money }}</span>
           <span class="rta-label">
             @if (rta() > 0) { Ready to Assign }
@@ -39,11 +39,11 @@
 
     <!-- toolbar -->
     <div class="toolbar">
-      <div class="chips" role="tablist">
-        <button class="chip" [class.on]="filter() === 'all'" (click)="filter.set('all')">All</button>
-        <button class="chip" [class.on]="filter() === 'underfunded'" (click)="filter.set('underfunded')">Underfunded @if (counts().under) {<span class="count">{{ counts().under }}</span>}</button>
-        <button class="chip" [class.on]="filter() === 'overspent'" (click)="filter.set('overspent')">Overspent @if (counts().over) {<span class="count neg">{{ counts().over }}</span>}</button>
-        <button class="chip" [class.on]="filter() === 'available'" (click)="filter.set('available')">Money available</button>
+      <div class="chips" role="group" aria-label="Filter categories">
+        <button class="chip" [class.on]="filter() === 'all'" [attr.aria-pressed]="filter() === 'all'" (click)="filter.set('all')">All</button>
+        <button class="chip" [class.on]="filter() === 'underfunded'" [attr.aria-pressed]="filter() === 'underfunded'" (click)="filter.set('underfunded')">Underfunded @if (counts().under) {<span class="count">{{ counts().under }}</span>}</button>
+        <button class="chip" [class.on]="filter() === 'overspent'" [attr.aria-pressed]="filter() === 'overspent'" (click)="filter.set('overspent')">Overspent @if (counts().over) {<span class="count neg">{{ counts().over }}</span>}</button>
+        <button class="chip" [class.on]="filter() === 'available'" [attr.aria-pressed]="filter() === 'available'" (click)="filter.set('available')">Money available</button>
       </div>
       <span class="grow"></span>
       @if (md().underfunded > 0 && rta() > 0) {
@@ -59,12 +59,12 @@
     }
 
     <!-- table -->
-    <div class="table" role="grid">
+    <div class="table">
       <div class="thead">
-        <div class="c-name"><button class="link" type="button" (click)="collapseAll(true)">Collapse</button> · <button class="link" type="button" (click)="collapseAll(false)">Expand</button></div>
-        <div class="c-num">Assigned</div>
-        <div class="c-num c-act">Activity</div>
-        <div class="c-num">Available</div>
+        <div class="c-name"><button class="link" type="button" (click)="collapseAll(true)">Collapse all</button> · <button class="link" type="button" (click)="collapseAll(false)">Expand all</button></div>
+        <div class="c-num" aria-hidden="true">Assigned</div>
+        <div class="c-num c-act" aria-hidden="true">Activity</div>
+        <div class="c-num" aria-hidden="true">Available</div>
       </div>
 
       @if (newGroup() !== null) {
@@ -78,18 +78,18 @@
           (dragover)="dragOver($event, 'g:' + g.group.id)" (drop)="drop($event, null, g.group)">
           <div class="grow-row g-head" [draggable]="!g.group.system" (dragstart)="dragStart($event, g.group.id, 'group')" (dragend)="dragEnd()">
             <div class="c-name">
-              <button class="twisty" type="button" (click)="toggleGroup(g.group)" [class.closed]="g.group.collapsed" [attr.aria-expanded]="!g.group.collapsed" aria-label="Toggle group"><app-icon name="chevron-down" [size]="15" /></button>
+              <button class="twisty hit" type="button" (click)="toggleGroup(g.group)" [class.closed]="g.group.collapsed" [attr.aria-expanded]="!g.group.collapsed" [attr.aria-label]="(g.group.collapsed ? 'Expand ' : 'Collapse ') + g.group.name"><app-icon name="chevron-down" [size]="15" /></button>
               @if (renaming() === g.group.id) {
                 <input class="input rename" [value]="g.group.name" #rn (keydown.enter)="rename(g.group.id, rn.value)" (keydown.escape)="renaming.set(null)" (blur)="rename(g.group.id, rn.value)" />
               } @else {
-                <span class="g-name" (dblclick)="startRename(g.group)">{{ g.group.name }}</span>
+                <h2 class="g-name" (dblclick)="startRename(g.group)">{{ g.group.name }}<span class="sr-only">, available {{ g.available | money }}</span></h2>
               }
               @if (!g.group.system) {
                 <span class="g-actions">
-                  <button class="btn ghost icon sm" type="button" title="Add category" (click)="newCatFor.set(g.group.id); focusSoon('.new-cat input')"><app-icon name="plus" [size]="15" /></button>
-                  <button class="btn ghost icon sm" type="button" title="Rename" (click)="renaming.set(g.group.id); focusSoon('.rename')"><app-icon name="edit" [size]="14" /></button>
-                  <button class="btn ghost icon sm" type="button" title="Hide group" (click)="hideGroup(g.group)"><app-icon name="eye-off" [size]="14" /></button>
-                  <button class="btn ghost icon sm" type="button" title="Delete group" (click)="deleteGroup(g.group)"><app-icon name="trash" [size]="14" /></button>
+                  <button class="btn ghost icon sm" type="button" [attr.aria-label]="'Add category to ' + g.group.name" title="Add category" (click)="newCatFor.set(g.group.id); focusSoon('.new-cat input')"><app-icon name="plus" [size]="15" /></button>
+                  <button class="btn ghost icon sm" type="button" [attr.aria-label]="'Rename ' + g.group.name" title="Rename" (click)="renaming.set(g.group.id); focusSoon('.rename')"><app-icon name="edit" [size]="14" /></button>
+                  <button class="btn ghost icon sm" type="button" [attr.aria-label]="'Hide ' + g.group.name" title="Hide group" (click)="hideGroup(g.group)"><app-icon name="eye-off" [size]="14" /></button>
+                  <button class="btn ghost icon sm" type="button" [attr.aria-label]="'Delete ' + g.group.name" title="Delete group" (click)="deleteGroup(g.group)"><app-icon name="trash" [size]="14" /></button>
                 </span>
               }
             </div>
@@ -106,16 +106,16 @@
               <div class="grow-row cat" [class.selected]="selectedId() === r.cat.id" [class.drop]="dropTarget() === r.cat.id" [class.dragging]="dragId() === r.cat.id"
                 (click)="select(r.cat.id)" (dragover)="dragOver($event, r.cat.id)" (drop)="$event.stopPropagation(); drop($event, r.cat, g.group)">
                 <div class="c-name">
-                  <span class="grip" [draggable]="!r.cat.ccAccountId" (dragstart)="dragStart($event, r.cat.id, 'row')" (dragend)="dragEnd()" (click)="$event.stopPropagation()" title="Drag to reorder"><app-icon name="grip" [size]="14" /></span>
+                  <span class="grip" aria-hidden="true" [draggable]="!r.cat.ccAccountId" (dragstart)="dragStart($event, r.cat.id, 'row')" (dragend)="dragEnd()" (click)="$event.stopPropagation()" title="Drag to reorder"><app-icon name="grip" [size]="14" /></span>
                   <div class="name-block">
                     <div class="name-line">
-                      @if (r.cat.emoji) { <span class="emoji">{{ r.cat.emoji }}</span> }
-                      <span class="cat-name">{{ r.cat.name }}</span>
-                      @if (r.cm.target) { <app-ring [value]="ringValue(r.cm)" [tone]="ringTone(r.cm)" [size]="15" /> }
+                      @if (r.cat.emoji) { <span class="emoji" aria-hidden="true">{{ r.cat.emoji }}</span> }
+                      <button type="button" class="cat-name" [attr.aria-label]="rowLabel(r)" (click)="$event.stopPropagation(); select(r.cat.id)">{{ r.cat.name }}</button>
+                      @if (r.cm.target) { <app-ring aria-hidden="true" [value]="ringValue(r.cm)" [tone]="ringTone(r.cm)" [size]="15" /> }
                     </div>
-                    @if (status(r); as s) { <div class="status" [class]="tone(r.cm)">{{ s }}</div> }
-                    <div class="m-sub num">Assigned {{ r.cm.assigned | money:'plain' }} · @if (r.cat.ccAccountId) { Activity {{ r.cm.activity | money:'plain' }} } @else { Spent {{ -r.cm.activity | money:'plain' }} }</div>
-                    <div class="bar"><i [style.width.%]="barWidth(r.cm)" [class]="tone(r.cm)"></i></div>
+                    @if (status(r); as s) { <div class="status" [class]="tone(r.cm)" aria-hidden="true">{{ s }}</div> }
+                    <div class="m-sub num" aria-hidden="true">Assigned {{ r.cm.assigned | money:'plain' }} · @if (r.cat.ccAccountId) { Activity {{ r.cm.activity | money:'plain' }} } @else { Spent {{ -r.cm.activity | money:'plain' }} }</div>
+                    <div class="bar" aria-hidden="true"><i [style.width.%]="barWidth(r.cm)" [class]="tone(r.cm)"></i></div>
                   </div>
                 </div>
                 <div class="c-num assigned" (click)="startEdit(r.cat.id, $event)">
@@ -123,14 +123,14 @@
                     <input class="input amount" [attr.data-assign]="r.cat.id" [value]="r.cm.assigned ? (r.cm.assigned | money:'plain') : ''" #ai inputmode="decimal"
                       (keydown)="assignKey($event, r.cat, r.cm.assigned)" (blur)="commitAssign(r.cat, ai.value, r.cm.assigned)" (click)="$event.stopPropagation()" />
                   } @else {
-                    <button class="assign-btn num" type="button" [class.zero]="!r.cm.assigned">{{ r.cm.assigned | money:'plain' }}</button>
+                    <button class="assign-btn num" type="button" [class.zero]="!r.cm.assigned" [attr.aria-label]="'Assigned ' + fmt(r.cm.assigned) + ' to ' + r.cat.name + '. Edit'">{{ r.cm.assigned | money:'plain' }}</button>
                   }
                 </div>
                 <div class="c-num c-act num activity">{{ r.cm.activity | money:'plain' }}</div>
                 <div class="c-num">
-                  <button class="pill" type="button" [class]="'pill ' + tone(r.cm)" draggable="true" (dragstart)="dragStart($event, r.cat.id, 'money')" (dragend)="dragEnd()"
-                    (click)="$event.stopPropagation(); move.set({ from: r.cat.id })" title="Move money (or drag onto another category)">
-                    {{ r.cm.available | money:'plain' }}
+                  <button class="pill hit" type="button" [class]="'pill hit ' + tone(r.cm)" draggable="true" (dragstart)="dragStart($event, r.cat.id, 'money')" (dragend)="dragEnd()"
+                    (click)="$event.stopPropagation(); move.set({ from: r.cat.id })" title="Move money (or drag onto another category)" [attr.aria-label]="'Available ' + fmt(r.cm.available) + ' in ' + r.cat.name + '. Move money'">
+                    @if (r.cm.available < 0) { <app-icon name="alert" [size]="12" [stroke]="2.6" /> }{{ r.cm.available | money:'plain' }}
                   </button>
                 </div>
               </div>

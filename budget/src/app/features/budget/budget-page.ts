@@ -334,6 +334,14 @@ export class BudgetPage {
     if (t.monthsLeft) return t.done ? 'Fully funded' : `On track · ${Math.round(t.progress * 100)}% saved · ${due}`;
     return 'Funded';
   }
+  /** one sentence for VoiceOver: name, available, state */
+  rowLabel(r: Row): string {
+    const parts = [r.cat.name, `available ${this.fmt(r.cm.available)}`];
+    const st = this.status(r);
+    if (st) parts.push(st);
+    else if (r.cm.assigned) parts.push(`assigned ${this.fmt(r.cm.assigned)}`);
+    return parts.join(', ') + '. Show details';
+  }
   private money = new MoneyPipe();
   fmt(v: number) { return this.money.transform(v, 'full'); }
   readonly RTA = RTA;

@@ -69,12 +69,12 @@ import { FREQS } from '../accounts/txn-form';
     </app-sheet>`,
   styles: `
     .page { padding: 20px 28px 120px; max-width: 900px; }
-    .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 16px; h1 { font-size: 26px; } p { margin: 4px 0 0; } }
-    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; div { display: flex; flex-direction: column; } span { font-size: 12px; color: var(--ink-3); font-weight: 600; } strong { font-size: 18px; } }
+    .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 16px; h1 { font-size: 1.625rem; } p { margin: 4px 0 0; } }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; div { display: flex; flex-direction: column; } span { font-size: 0.75rem; color: var(--ink-3); font-weight: 600; } strong { font-size: 1.125rem; } }
     .list { overflow: hidden; }
     .item { display: grid; grid-template-columns: 130px 1fr auto; gap: 14px; align-items: center; width: 100%; padding: 12px 16px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; cursor: pointer;
       &:hover { background: var(--surface-2); } &:last-child { border-bottom: 0; }
-      span { display: flex; flex-direction: column; min-width: 0; } small { color: var(--ink-3); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .amt { font-weight: 650; } }
+      span { display: flex; flex-direction: column; min-width: 0; } small { color: var(--ink-3); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .amt { font-weight: 650; } }
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .end { justify-content: flex-end; }
     @media (max-width: 640px) { .page { padding: 14px 12px 110px; } .summary { grid-template-columns: 1fr 1fr; } .item { grid-template-columns: 1fr auto; .when { display: none; } } }`,

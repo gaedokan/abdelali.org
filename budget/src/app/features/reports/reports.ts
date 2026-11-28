@@ -264,7 +264,7 @@ const CX = 100, CY = 100, R = 78;
     }
     .page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
     .head { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; }
-    .head h1 { font-size: 26px; }
+    .head h1 { font-size: 1.625rem; }
     .tabs { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
     .tabs button { white-space: nowrap; transition: background .2s var(--ease), color .2s; }
     .filters { display: flex; gap: 10px 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
@@ -279,7 +279,7 @@ const CX = 100, CY = 100, R = 78;
     .card-head { display: flex; align-items: center; justify-content: space-between; min-height: 28px; margin-bottom: 4px; }
     .card-head .section-title { margin: 0; }
     .pad { padding: 28px 0; text-align: center; }
-    .foot { margin: 14px 0 0; font-size: 13px; }
+    .foot { margin: 14px 0 0; font-size: 0.8125rem; }
 
     .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
     .donut { width: 100%; max-width: 230px; height: auto; flex: none; overflow: visible; }
@@ -288,15 +288,15 @@ const CX = 100, CY = 100, R = 78;
     .slice.click { cursor: pointer; }
     .slice:hover { stroke-width: 31; }
     .slice.dim { opacity: .35; }
-    .d-total { font: 650 20px var(--display); fill: var(--ink); }
-    .d-sub { font: 500 10px var(--font); fill: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+    .d-total { font: 650 1.25rem var(--display); fill: var(--ink); }
+    .d-sub { font: 500 0.625rem var(--font); fill: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
     .legend { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 2px; }
     .lg-row { width: 100%; display: grid; grid-template-columns: 10px minmax(0, 1fr) auto auto; align-items: center; gap: 10px; border: 0; background: transparent; padding: 8px 10px; border-radius: 8px; cursor: pointer; text-align: left; transition: background .15s, opacity .2s; }
     .lg-row:hover:not(:disabled) { background: var(--sunken); }
     .lg-row:disabled { cursor: default; }
-    .lg-row.dim { opacity: .45; }
+    .lg-row.dim .dot { opacity: .3; }
     .lg-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 550; }
-    .lg-pct { font-size: 12px; min-width: 34px; text-align: right; }
+    .lg-pct { font-size: 0.75rem; min-width: 34px; text-align: right; }
     .lg-amt { font-weight: 600; min-width: 64px; text-align: right; }
     .lg-row { gap: 8px; padding: 7px 8px; }
     .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
@@ -304,7 +304,7 @@ const CX = 100, CY = 100, R = 78;
     .chart { width: 100%; height: auto; display: block; margin-top: 10px; overflow: visible; }
     .grid { stroke: var(--line); stroke-width: 1; }
     .grid.zero { stroke: var(--line-2); }
-    .ax { font: 500 10.5px var(--font); fill: var(--ink-3); }
+    .ax { font: 500 0.6562rem var(--font); fill: var(--ink-3); }
     .bar { fill: var(--accent); opacity: .85; transition: opacity .2s, filter .2s; }
     .bar.pos { fill: var(--pos); }
     .bar.neg { fill: var(--neg); }
@@ -314,30 +314,30 @@ const CX = 100, CY = 100, R = 78;
     .nwdot { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
 
     .nw-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
-    .big { font: 650 32px/1.1 var(--display); letter-spacing: -.02em; }
-    .big small { font-size: 15px; font-weight: 500; color: var(--ink-2); }
+    .big { font: 650 2rem/1.1 var(--display); letter-spacing: -.02em; }
+    .big small { font-size: 0.9375rem; font-weight: 500; color: var(--ink-2); }
     .delta { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--zero-soft); }
     .delta.up { background: var(--pos-soft); color: var(--pos); }
     .delta.down { background: var(--neg-soft); color: var(--neg); }
     .delta .muted { font-weight: 450; }
-    .key { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; font-size: 12.5px; color: var(--ink-2); }
+    .key { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; font-size: 0.7812rem; color: var(--ink-2); }
     .key span { display: inline-flex; align-items: center; gap: 6px; }
     .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
     .sw.line { height: 2px; width: 14px; background: var(--ink); border-radius: 2px; }
 
     .scroll { overflow-x: auto; margin: 0 -22px; padding: 0 22px; }
-    table.ie { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13.5px; }
+    table.ie { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 0.8438rem; }
     .ie th, .ie td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
-    .ie th { font: 650 11px var(--font); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); border-bottom-color: var(--line-2); }
+    .ie th { font: 650 0.6875rem var(--font); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); border-bottom-color: var(--line-2); }
     .ie td.name, .ie th.sticky { text-align: left; }
     .ie .sticky { position: sticky; left: 0; background: var(--surface); z-index: 1; min-width: 170px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
     .ie .strong { font-weight: 650; }
     .ie tbody tr { transition: background .15s; }
     .ie tbody tr:hover td, .ie tbody tr:hover .sticky { background: var(--surface-2); }
-    .r-head td { padding-top: 18px; font: 650 11px var(--font); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); border-bottom: 0; }
+    .r-head td { padding-top: 18px; font: 650 0.6875rem var(--font); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); border-bottom: 0; }
     .r-sum td { font-weight: 650; background: var(--surface-2); }
     .r-sum .sticky { background: var(--surface-2); }
-    .r-net td { font-weight: 700; border-top: 2px solid var(--line-2); border-bottom: 0; font-size: 14.5px; }
+    .r-net td { font-weight: 700; border-top: 2px solid var(--line-2); border-bottom: 0; font-size: 0.9062rem; }
     .r-group td { font-weight: 600; }
     .r-cat td { color: var(--ink-2); }
     .tog { display: inline-flex; align-items: center; gap: 8px; border: 0; background: transparent; cursor: pointer; padding: 0; font-weight: 600; }
@@ -348,18 +348,18 @@ const CX = 100, CY = 100, R = 78;
     .zero { color: var(--ink-3); }
 
     .insights { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
-    .stat p { margin: 10px 0 0; font-size: 13.5px; }
+    .stat p { margin: 10px 0 0; font-size: 0.8438rem; }
     .pr { margin-top: 14px; }
     .pr:first-of-type { margin-top: 4px; }
     .pr-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 550; margin-bottom: 6px; }
     .pr-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .pr-sub { font-size: 12px; margin-top: 5px; }
+    .pr-sub { font-size: 0.75rem; margin-top: 5px; }
     .meter { position: relative; height: 8px; background: var(--sunken); border-radius: 99px; overflow: visible; }
     .meter i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .5s var(--ease); }
     .meter.warn i { background: var(--warn); }
     .meter b { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--ink-2); border-radius: 2px; }
 
-    .tip { position: fixed; z-index: 50; pointer-events: none; background: var(--ink); color: var(--bg); padding: 8px 11px; border-radius: 9px; font-size: 12.5px; box-shadow: var(--shadow-2); min-width: 120px; animation: rise .12s var(--ease); }
+    .tip { position: fixed; z-index: 50; pointer-events: none; background: var(--ink); color: var(--bg); padding: 8px 11px; border-radius: 9px; font-size: 0.7812rem; box-shadow: var(--shadow-2); min-width: 120px; animation: rise .12s var(--ease); }
     .tip-title { font-weight: 650; margin-bottom: 3px; }
     .tip-row { display: flex; align-items: center; gap: 7px; }
     .tip-row span { flex: 1; opacity: .8; }
@@ -377,7 +377,7 @@ const CX = 100, CY = 100, R = 78;
       .card-pad { padding: 16px; }
       .scroll { margin: 0 -16px; padding: 0 16px; }
       .acct { width: 100%; }
-      .big { font-size: 27px; }
+      .big { font-size: 1.6875rem; }
     }
   `,
 })

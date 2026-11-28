@@ -35,7 +35,7 @@
       @if (sync.serverConfigured() === false) {
         <div class="status warn"><app-icon name="alert" [size]="18" /><span>The server isn’t set up yet: it needs the <code>BUDGET_DB</code> D1 binding and a <code>BUDGET_PASSWORD</code> secret (see the README).</span></div>
       }
-      <div class="row"><input class="input pw" type="password" [value]="pw()" (input)="pw.set($any($event.target).value)" placeholder="Sync password" (keydown.enter)="connect()" autocomplete="current-password" />
+      <div class="row"><input class="input pw" type="password" aria-label="Sync password" [value]="pw()" (input)="pw.set($any($event.target).value)" placeholder="Sync password" (keydown.enter)="connect()" autocomplete="current-password" />
         <button class="btn primary" type="button" (click)="connect()" [disabled]="busy() || !pw()">{{ busy() ? 'Connecting…' : 'Turn on sync' }}</button></div>
       @if (syncErr()) { <p class="err">{{ syncErr() }}</p> }
     }
@@ -48,7 +48,7 @@
       <li>Open <b>Shortcuts</b> → <b>Automation</b> → <b>+</b> → <b>Transaction</b>. Choose your cards, keep the other options, and pick <b>Run Immediately</b>.</li>
       <li>Add the action <b>Get Contents of URL</b>:
         <div class="kv">
-          <span>URL</span><code>{{ endpoint }}</code><button class="btn sm ghost" type="button" (click)="copy(endpoint)"><app-icon name="copy" [size]="13" /></button>
+          <span>URL</span><code>{{ endpoint }}</code><button class="btn sm ghost" type="button" (click)="copy(endpoint)" aria-label="Copy URL"><app-icon name="copy" [size]="13" /></button>
           <span>Method</span><code>POST</code><i></i>
           <span>Headers</span><code>Authorization: Bearer <em>your sync password or wallet token</em></code><i></i>
           <span>Request body</span><code>JSON — <b>amount</b> = Shortcut Input › Amount, <b>merchant</b> = Merchant, <b>card</b> = Card or Pass › Name</code><i></i>
@@ -63,15 +63,15 @@
   <section class="card">
     <h2><app-icon name="list" /> Payees</h2>
     <p class="muted">Rename payees, set the category they should get automatically, or merge duplicates (e.g. “CARREFOUR MARKET 123” into “Carrefour”).</p>
-    <input class="input search" placeholder="Search payees" [value]="payeeQuery()" (input)="payeeQuery.set($any($event.target).value)" />
+    <input class="input search" type="search" aria-label="Search payees" placeholder="Search payees" [value]="payeeQuery()" (input)="payeeQuery.set($any($event.target).value)" />
     <div class="payees">
       @for (x of payees(); track x.p.id) {
         <div class="payee" data-form>
-          <input class="input" [value]="x.p.name" (change)="renamePayee(x.p, $any($event.target).value)" />
+          <input class="input" [attr.aria-label]="'Name of payee ' + x.p.name" [value]="x.p.name" (change)="renamePayee(x.p, $any($event.target).value)" />
           <app-combo [compact]="true" [items]="pickers.categories()" [value]="x.p.categoryId ?? null" (valueChange)="setPayeeCategory(x.p, $event)" placeholder="Auto category" />
           <app-combo [compact]="true" [items]="payeeItems()" [value]="mergeInto()[x.p.id] ?? null" (valueChange)="setMerge(x.p.id, $event)" placeholder="Merge into…" />
           <button class="btn sm" type="button" [disabled]="!mergeInto()[x.p.id]" (click)="merge(x.p)">Merge</button>
-          <span class="n">{{ x.n }}</span>
+          <span class="n" [attr.aria-label]="x.n + ' transactions'">{{ x.n }}</span>
         </div>
       } @empty { <p class="muted">No payees yet.</p> }
     </div>

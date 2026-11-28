@@ -31,7 +31,7 @@
     <button class="btn" type="button" (click)="ui.importFor.set(account()?.id ?? null)"><app-icon name="import" [size]="16" /> Import</button>
     @if (account()) { <button class="btn" type="button" (click)="openReconcile()"><app-icon name="lock" [size]="15" /> Reconcile</button> }
     <span class="grow"></span>
-    <div class="search"><app-icon name="search" [size]="15" /><input class="input" placeholder="Search payee, category, memo, amount" [value]="search()" (input)="search.set($any($event.target).value); limit.set(150)" /></div>
+    <div class="search"><app-icon name="search" [size]="15" /><input class="input" type="search" aria-label="Search transactions" enterkeyhint="search" placeholder="Search payee, category, memo, amount" [value]="search()" (input)="search.set($any($event.target).value); limit.set(150)" /></div>
   </div>
 
   <div class="chips">
@@ -60,7 +60,7 @@
 
   <div class="table" [style.--reg-cols]="cols()">
     @if (wide()) {
-      <div class="thead">
+      <div class="thead" aria-hidden="true">
         <div class="c-sel"><input type="checkbox" [checked]="allSelected()" (change)="toggleAll()" aria-label="Select all" /></div>
         <div class="c-flag"></div>
         <div class="c-date">Date</div>
@@ -100,9 +100,9 @@
         <app-txn-form layout="row" [txnId]="l.t.id" [showAccount]="!account()" (saved)="editing.set(null)" (cancelled)="editing.set(null)" />
       } @else {
         <div class="line" [class.unapproved]="!l.t.approved" [class.sel]="selected().has(l.t.id)" [class.future]="l.t.date > today" (click)="edit(l, $event)">
-          <div class="c-sel"><input type="checkbox" [checked]="selected().has(l.t.id)" (click)="toggleSel(l.t.id, $event)" aria-label="Select" /></div>
-          <div class="c-flag">@if (l.t.flag) { <i class="flag" [attr.data-c]="l.t.flag"></i> }</div>
-          <div class="c-date">{{ l.t.date | date }}</div>
+          <label class="c-sel" (click)="$event.stopPropagation()"><input type="checkbox" [checked]="selected().has(l.t.id)" (change)="toggleSel(l.t.id)" [attr.aria-label]="'Select ' + (l.payee || 'transaction')" /></label>
+          <div class="c-flag">@if (l.t.flag) { <i class="flag" [attr.data-c]="l.t.flag" role="img" [attr.aria-label]="l.t.flag + ' flag'"></i> }</div>
+          <div class="c-date"><button type="button" class="cell-btn" (click)="openLine(l)" [attr.aria-label]="lineLabel(l)">{{ l.t.date | date }}</button></div>
           @if (!account()) { <div class="c-acct ell">{{ l.account }}</div> }
           <div class="c-payee ell">
             @if (l.transfer) { <app-icon name="transfer" [size]="13" class="tr" /> }
@@ -118,19 +118,19 @@
           @if (account()) { <div class="c-bal num" [class.amt-neg]="(l.balance ?? 0) < 0">{{ l.balance | money:'plain' }}</div> }
           <div class="c-clr">
             @if (!l.t.approved) {
-              <button class="approve" type="button" (click)="approve(l.t.id, $event)" title="Approve"><app-icon name="check" [size]="13" [stroke]="3" /></button>
+              <button class="approve hit" type="button" (click)="approve(l.t.id, $event)" title="Approve" [attr.aria-label]="'Approve ' + (l.payee || 'transaction')"><app-icon name="check" [size]="13" [stroke]="3" /></button>
             } @else if (l.t.cleared === 'reconciled') {
-              <span class="clr rec" title="Reconciled"><app-icon name="lock" [size]="11" /></span>
+              <span class="clr rec" title="Reconciled" role="img" aria-label="Reconciled"><app-icon name="lock" [size]="11" /></span>
             } @else {
-              <button class="clr" [class.on]="l.t.cleared === 'cleared'" type="button" (click)="toggleCleared(l.t.id, $event)" [title]="l.t.cleared === 'cleared' ? 'Cleared' : 'Uncleared'">C</button>
+              <button class="clr hit" [class.on]="l.t.cleared === 'cleared'" type="button" (click)="toggleCleared(l.t.id, $event)" [title]="l.t.cleared === 'cleared' ? 'Cleared' : 'Uncleared'" aria-label="Cleared" [attr.aria-pressed]="l.t.cleared === 'cleared'">C</button>
             }
           </div>
           <!-- phone layout -->
-          <div class="m-main">
+          <button type="button" class="m-main" (click)="openLine(l)" [attr.aria-label]="lineLabel(l)">
             <span class="m-payee">@if (!l.t.approved) {<i class="newdot"></i>}{{ l.payee || 'No payee' }}</span>
             <span class="m-sub">{{ l.category || (l.transfer ? '' : 'Needs a category') }}@if (!account()) { · {{ l.account }} } · {{ l.t.date | date }}</span>
-          </div>
-          <div class="m-amt num" [class.amt-pos]="l.t.amount > 0">{{ l.t.amount | money:'plain' }}</div>
+          </button>
+          <div class="m-amt num" aria-hidden="true" [class.amt-pos]="l.t.amount > 0">{{ l.t.amount | money:'plain' }}</div>
         </div>
       }
     } @empty {

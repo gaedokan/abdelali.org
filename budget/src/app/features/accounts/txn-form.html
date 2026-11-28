@@ -10,7 +10,7 @@
     <div class="f-memo"><input class="input compact" [value]="memo()" (input)="memo.set($any($event.target).value)" placeholder="Memo" aria-label="Memo" /></div>
     <div class="f-out"><input class="input compact amount" [value]="out()" (input)="setOut($any($event.target).value)" placeholder="Outflow" inputmode="decimal" aria-label="Outflow" /></div>
     <div class="f-in"><input class="input compact amount" [value]="inn()" (input)="setIn($any($event.target).value)" placeholder="Inflow" inputmode="decimal" aria-label="Inflow" /></div>
-    <div class="f-clr"><button type="button" class="clr" [class.on]="cleared()" (click)="cleared.set(!cleared())" title="Cleared">C</button></div>
+    <div class="f-clr"><button type="button" class="clr hit" [class.on]="cleared()" (click)="cleared.set(!cleared())" title="Cleared" aria-label="Cleared" [attr.aria-pressed]="cleared()">C</button></div>
   </div>
   @if (isSplit()) {
     <div class="splits">
@@ -35,11 +35,11 @@
 } @else {
   <form class="stackform" data-form (submit)="$event.preventDefault(); save()">
     <div class="amount-block" [class.in]="dir() === 'in'">
-      <div class="seg">
-        <button type="button" [class.on]="dir() === 'out'" (click)="dir.set('out')"><app-icon name="arrow-out" [size]="14" /> Outflow</button>
-        <button type="button" [class.on]="dir() === 'in'" (click)="dir.set('in')"><app-icon name="arrow-in" [size]="14" /> Inflow</button>
+      <div class="seg" role="group" aria-label="Direction">
+        <button type="button" [class.on]="dir() === 'out'" [attr.aria-pressed]="dir() === 'out'" (click)="dir.set('out')"><app-icon name="arrow-out" [size]="14" /> Outflow</button>
+        <button type="button" [class.on]="dir() === 'in'" [attr.aria-pressed]="dir() === 'in'" (click)="dir.set('in')"><app-icon name="arrow-in" [size]="14" /> Inflow</button>
       </div>
-      <input class="big-amount" [value]="amount()" (input)="amount.set($any($event.target).value)" placeholder="0,00" inputmode="decimal" aria-label="Amount" />
+      <input class="big-amount" [value]="amount()" (input)="amount.set($any($event.target).value)" placeholder="0,00" inputmode="decimal" enterkeyhint="next" [attr.aria-label]="(dir() === 'out' ? 'Outflow' : 'Inflow') + ' amount'" />
       <span class="cur">{{ store_currency() }}</span>
     </div>
     <label class="field"><span>Payee</span>
@@ -70,10 +70,10 @@
         <label class="field"><span>Repeat</span>
           <select class="select" [value]="repeat()" (change)="repeat.set($any($event.target).value)">@for (f of freqs; track f.id) {<option [value]="f.id">{{ f.label }}</option>}</select></label>
       }
-      <div class="field"><span>Flag</span>
+      <div class="field" role="group" aria-label="Flag"><span aria-hidden="true">Flag</span>
         <div class="flags">
-          <button type="button" class="flag none" [class.on]="!flag()" (click)="flag.set(null)" aria-label="No flag"></button>
-          @for (f of flags; track f) { <button type="button" class="flag" [attr.data-c]="f" [class.on]="flag() === f" (click)="flag.set(f)" [attr.aria-label]="f + ' flag'"></button> }
+          <button type="button" class="flag none hit" [class.on]="!flag()" [attr.aria-pressed]="!flag()" (click)="flag.set(null)" aria-label="No flag"></button>
+          @for (f of flags; track f) { <button type="button" class="flag hit" [attr.data-c]="f" [class.on]="flag() === f" [attr.aria-pressed]="flag() === f" (click)="flag.set(f)" [attr.aria-label]="f + ' flag'"></button> }
         </div>
       </div>
     </div>

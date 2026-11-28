@@ -59,10 +59,10 @@ const ICON: Record<string, string> = { checking: 'bank', savings: 'piggy', cash:
     </app-sheet>`,
   styles: `
     .types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .type { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 12.5px; font-weight: 550; text-align: center;
-      small { font-size: 10.5px; color: var(--ink-3); font-weight: 500; } app-icon { color: var(--ink-2); }
+    .type { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 0.7812rem; font-weight: 550; text-align: center;
+      small { font-size: 0.6562rem; color: var(--ink-3); font-weight: 500; } app-icon { color: var(--ink-2); }
       &.on { border-color: var(--accent); background: var(--accent-soft); app-icon { color: var(--accent); } } }
-    .hint { font-size: 12.5px; color: var(--ink-3); margin: 0; font-weight: 400; }
+    .hint { font-size: 0.7812rem; color: var(--ink-3); margin: 0; font-weight: 400; }
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .end { justify-content: flex-end; }
     @media (max-width: 480px) { .types { grid-template-columns: repeat(2, 1fr); } }`,
