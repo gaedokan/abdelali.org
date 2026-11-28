@@ -48,7 +48,7 @@ See [budget/README.md](budget/README.md) for features, sync setup (D1 + password
 
 ## Going live
 
-While `"preview": true` is set in `content/site.json`, every page tells search engines not to index it, and the site has no public address (no `*.workers.dev` URL, no custom domain).
+While `"preview": true` is set in `content/site.json`, every page tells search engines not to index it. The site has no custom domain: it is only served at `abdelali-site.<account>.workers.dev`, which must stay behind Cloudflare Access (Workers & Pages → abdelali-site → Settings → Domains & Routes → workers.dev → turn on Cloudflare Access, then allow only your email in Zero Trust → Access → Applications).
 
 To launch: set `"preview": false`, push, and attach the custom domain `abdelali.org` to the `abdelali-site` Worker in Cloudflare (Workers & Pages → abdelali-site → Settings → Domains & Routes).
 

@@ -17,8 +17,9 @@
     { "binding": "BUDGET_DB", "database_name": "budget-db", "database_id": "83ad0c0e-38b3-4916-9a81-6708c3d45ceb" }
   ],
   "vars": { "BUDGET_TIMEZONE": "Africa/Casablanca" },
-  // Private while in review: no public *.workers.dev address and no preview links.
-  // The site only becomes public once a custom domain (abdelali.org) is attached.
-  "workers_dev": false,
+  // Reachable only at abdelali-site.<account>.workers.dev, behind Cloudflare Access (login
+  // required: Settings → Domains & Routes → workers.dev → Cloudflare Access). No custom domain,
+  // no preview links.
+  "workers_dev": true,
   "preview_urls": false
 }
